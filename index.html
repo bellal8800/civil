@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Civil Engineering Design Workspace</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="app">
+<aside class="sidebar">
+  <div class="brand"><span class="brand-mark">CE</span><div><b>Civil Engineering</b><small>Design Workspace</small></div></div>
+  <div class="side-actions">
+    <button id="newFolderBtn" class="primary">＋ New Folder</button>
+    <button id="newToolBtn">＋ New Tool</button>
+  </div>
+  <div class="tree-head"><span>PROJECT TREE</span><button id="resetBtn">↻</button></div>
+  <div id="tree" class="tree"></div>
+</aside>
+<main class="main">
+<header>
+  <div><div class="eyebrow">ACI 318-25 • BNBC 2020</div><h1 id="pageTitle">Welcome to your workspace</h1><p id="pageSub">Create folders and organize RCC design tools.</p></div>
+  <input id="search" placeholder="Search folders & tools…">
+</header>
+<section id="welcome" class="welcome">
+  <div class="hero-icon">▦</div><h2>Build your Civil Engineering Toolkit</h2>
+  <p>Create folders for RCC Beam, Column, Slab, Foundation and add calculators/tools inside them.</p>
+  <button id="welcomeFolder" class="primary">＋ Create New Folder</button>
+  <div class="examples"><span>RCC Beam</span><span>RCC Column</span><span>RCC Slab</span><span>Foundation</span></div>
+</section>
+<section id="toolPanel" class="panel hidden">
+  <div class="panel-title"><div><span class="badge">TOOL</span><h2 id="toolName"></h2></div><button id="closeTool">×</button></div>
+  <p id="toolInfo"></p>
+  <div class="tool-placeholder"><strong>Tool workspace</strong><span>This is where the ACI 318-25 calculation module will open.</span></div>
+</section>
+</main></div>
+<div id="modal" class="modal hidden"><div class="modal-card">
+<h3 id="modalTitle">Create New Folder</h3><p id="modalHint">Enter a name.</p>
+<input id="modalInput" autofocus><div class="modal-actions"><button id="cancelModal">Cancel</button><button id="saveModal" class="primary">Create</button></div>
+</div></div>
+<script src="script.js"></script>
+</body></html>

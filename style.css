@@ -58,3 +58,22 @@ header{display:flex;justify-content:space-between;gap:20px;align-items:flex-star
 @media(prefers-reduced-motion:reduce){*,*:before,*:after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;scroll-behavior:auto!important}}
 @media(max-width:760px){.sidebar{width:240px}.main{padding:20px}header{display:block}#search{width:100%;margin-top:18px}h1{font-size:25px}}
 @media(max-width:560px){.app{display:block}.sidebar{width:100%;border-right:0;border-bottom:1px solid #e4e8ef}.tree{max-height:280px}.main{padding:16px}}
+/* RCC calculator UI */
+.calc-grid{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(300px,.85fr);gap:18px;margin-top:24px}
+.calc-card{background:#fbfcfe;border:1px solid #e2e7ef;border-radius:14px;padding:20px;animation:softIn .55s var(--spring)}
+.calc-card h3{margin:0 0 16px;font-size:16px}
+.field-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.field-grid label{display:grid;gap:6px;color:#566277;font-size:12px;font-weight:750}
+.field-grid label span{float:right;color:#8a94a5;font-weight:500}
+.field-grid input{width:100%;padding:10px 11px;border:1px solid #d7dee9;border-radius:9px;background:#fff;color:#172033;font-size:14px;outline:none;transition:border-color .25s var(--smooth),box-shadow .3s var(--spring)}
+.field-grid input:focus{border-color:#8eb0ee;box-shadow:0 0 0 4px #1457d914}
+.calc-btn{width:100%;margin-top:16px;padding:12px}
+.results{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.result{border:1px solid #e3e8ef;background:#fff;border-radius:11px;padding:13px;min-height:82px;display:flex;flex-direction:column;gap:4px;transition:transform .35s var(--spring),box-shadow .35s var(--spring)}
+.result:hover{transform:translateY(-2px);box-shadow:0 8px 18px #1d2b3d10}
+.result span{font-size:11px;color:#717c8f}.result strong{font-size:20px;color:#173f91}.result small{font-size:10px;color:#98a1af}
+.calc-message{margin-top:12px;padding:11px 12px;border-radius:9px;background:#eef4ff;color:#31588f;font-size:12px;line-height:1.5}
+.basis{margin-top:18px;padding:18px;border-radius:13px;background:#f8fafc;border:1px solid #e4e8ef;color:#667287;font-size:12px;line-height:1.55}
+.basis h3{margin:0 0 8px;color:#253148;font-size:14px}.basis p{margin:5px 0}.basis .note{margin-top:12px;padding-top:10px;border-top:1px solid #e1e6ee;color:#7a8495}
+@media(max-width:900px){.calc-grid{grid-template-columns:1fr}}
+@media(max-width:560px){.field-grid,.results{grid-template-columns:1fr}.panel{padding:18px}}

@@ -1,8 +1,10 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Civil Engineering Design Workspace</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#f5f7fb">
+<title>ACI 318-25 RCC Beam Automation</title>
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -16,26 +18,82 @@
   <div class="tree-head"><span>PROJECT TREE</span><button id="resetBtn">↻</button></div>
   <div id="tree" class="tree"></div>
 </aside>
+
 <main class="main">
 <header>
-  <div><div class="eyebrow">ACI 318-25 • BNBC 2020</div><h1 id="pageTitle">Welcome to your workspace</h1><p id="pageSub">Create folders and organize RCC design tools.</p></div>
+  <div>
+    <div class="eyebrow">ACI 318-25 • BNBC 2020</div>
+    <h1 id="pageTitle">RCC Beam Design Automation</h1>
+    <p id="pageSub">Factored moment and shear calculator • Version 1</p>
+  </div>
   <input id="search" placeholder="Search folders & tools…">
 </header>
+
 <section id="welcome" class="welcome">
-  <div class="hero-icon">▦</div><h2>Build your Civil Engineering Toolkit</h2>
-  <p>Create folders for RCC Beam, Column, Slab, Foundation and add calculators/tools inside them.</p>
-  <button id="welcomeFolder" class="primary">＋ Create New Folder</button>
+  <div class="hero-icon">∑</div>
+  <h2>RCC Design Automation</h2>
+  <p>Start with beam geometry and loads. The calculator determines self-weight, factored load, support reactions, Mu, Vu and effective depth.</p>
+  <button id="welcomeBeam" class="primary">Open Beam Analysis</button>
   <div class="examples"><span>RCC Beam</span><span>RCC Column</span><span>RCC Slab</span><span>Foundation</span></div>
 </section>
+
 <section id="toolPanel" class="panel hidden">
-  <div class="panel-title"><div><span class="badge">TOOL</span><h2 id="toolName"></h2></div><button id="closeTool">×</button></div>
-  <p id="toolInfo"></p>
-  <div class="tool-placeholder"><strong>Tool workspace</strong><span>This is where the ACI 318-25 calculation module will open.</span></div>
+  <div class="panel-title">
+    <div><span class="badge">ACI 318-25 • BEAM</span><h2 id="toolName">Beam Analysis</h2></div>
+    <button id="closeTool">×</button>
+  </div>
+
+  <div class="calc-grid">
+    <div class="calc-card">
+      <h3>1. Beam & Load Inputs</h3>
+      <div class="field-grid">
+        <label>Span, L <span>m</span><input id="L" type="number" value="6" min="0.1" step="0.1"></label>
+        <label>Width, b <span>mm</span><input id="b" type="number" value="300" min="50" step="10"></label>
+        <label>Overall depth, h <span>mm</span><input id="h" type="number" value="500" min="100" step="10"></label>
+        <label>Concrete, f′c <span>MPa</span><input id="fc" type="number" value="28" min="10" step="1"></label>
+        <label>Steel, fy <span>MPa</span><input id="fy" type="number" value="420" min="200" step="5"></label>
+        <label>Clear cover <span>mm</span><input id="cover" type="number" value="40" min="10" step="1"></label>
+        <label>Main bar diameter <span>mm</span><input id="bar" type="number" value="16" min="8" step="1"></label>
+        <label>Stirrup diameter <span>mm</span><input id="stirrup" type="number" value="10" min="6" step="1"></label>
+        <label>Additional dead load <span>kN/m</span><input id="Dadd" type="number" value="2" min="0" step="0.1"></label>
+        <label>Live load <span>kN/m</span><input id="Lload" type="number" value="5" min="0" step="0.1"></label>
+      </div>
+      <button id="calculateBeam" class="primary calc-btn">Calculate Beam Actions</button>
+    </div>
+
+    <div class="calc-card result-card">
+      <h3>2. Analysis Results</h3>
+      <div id="results" class="results">
+        <div class="result"><span>Self-weight</span><strong id="rSW">—</strong><small>kN/m</small></div>
+        <div class="result"><span>Factored load, wu</span><strong id="rWu">—</strong><small>kN/m</small></div>
+        <div class="result"><span>Reaction, Vu</span><strong id="rVu">—</strong><small>kN</small></div>
+        <div class="result"><span>Moment, Mu</span><strong id="rMu">—</strong><small>kN·m</small></div>
+        <div class="result"><span>Effective depth, d</span><strong id="rD">—</strong><small>mm</small></div>
+        <div class="result"><span>Concrete design check</span><strong id="rPhi">—</strong><small>initial φ</small></div>
+      </div>
+      <div id="calcMessage" class="calc-message">Enter values and calculate.</div>
+    </div>
+  </div>
+
+  <div class="basis">
+    <h3>Calculation basis</h3>
+    <p><b>Self-weight:</b> b × h × 24 kN/m³.</p>
+    <p><b>Factored load:</b> wu = max(1.4D, 1.2D + 1.6L).</p>
+    <p><b>Simply supported beam:</b> Mu = wuL²/8 and Vu = wuL/2.</p>
+    <p><b>Effective depth:</b> d ≈ h − cover − stirrup diameter − main bar diameter/2.</p>
+    <p class="note">This Version 1 is an analysis-action module, not a complete structural design approval. Final reinforcement, shear design, development length and detailing will be added in later modules and must be code-checked by a qualified engineer.</p>
+  </div>
 </section>
-</main></div>
-<div id="modal" class="modal hidden"><div class="modal-card">
-<h3 id="modalTitle">Create New Folder</h3><p id="modalHint">Enter a name.</p>
-<input id="modalInput" autofocus><div class="modal-actions"><button id="cancelModal">Cancel</button><button id="saveModal" class="primary">Create</button></div>
-</div></div>
+</main>
+</div>
+
+<div id="modal" class="modal hidden">
+  <div class="modal-card">
+    <h3 id="modalTitle">Create New Folder</h3><p id="modalHint">Enter a name.</p>
+    <input id="modalInput" autofocus>
+    <div class="modal-actions"><button id="cancelModal">Cancel</button><button id="saveModal" class="primary">Create</button></div>
+  </div>
+</div>
 <script src="script.js"></script>
-</body></html>
+</body>
+</html>

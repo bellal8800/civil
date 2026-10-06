@@ -2,28 +2,29 @@
 <html lang="en">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="theme-color" content="#0b63ce"><title>Civil Engineering Load Calculator</title>
+<meta name="theme-color" content="#0b63ce"><title>BNBC 2020 Civil Engineering Calculator</title>
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
 <div class="app">
 <aside class="sidebar">
-<div class="brand"><div class="brand-mark">CE</div><div><strong>Civil Engineering</strong><span>Load Calculator</span></div></div>
+<div class="brand"><div class="brand-mark">CE</div><div><strong>Civil Engineering</strong><span>BNBC 2020 Toolkit</span></div></div>
 <nav>
 <button class="nav-item active" data-section="loads">▤ <span>Load Calculator</span></button>
 <button class="nav-item" data-section="beam">▦ <span>RCC Beam</span></button>
 <button class="nav-item" data-section="column">▥ <span>RCC Column</span></button>
 <button class="nav-item" data-section="slab">▤ <span>RCC Slab</span></button>
 </nav>
-<div class="side-note"><b>Engineering toolkit</b><p>Enter dimensions and material properties. The calculator updates the load results automatically.</p></div>
+<div class="side-note"><b>BNBC 2020 basis</b><p>Gravity loads are organized around BNBC 2020 Part 6, Chapter 2. Check project-specific drawings, occupancy and actual materials before final design.</p></div>
 </aside>
 <main class="main">
-<header class="topbar"><div><p class="eyebrow">CIVIL ENGINEERING • LOAD ANALYSIS</p><h1>Building Load Calculator</h1><p class="subtitle">Slab, beam, wall, finishing and live-load inputs with automatic load output.</p></div><div class="status"><span></span> Ready</div></header>
+<header class="topbar"><div><p class="eyebrow">BNBC 2020 • PART 6 • STRUCTURAL DESIGN</p><h1>Building Load Calculator</h1><p class="subtitle">Slab, beam, wall, finishing and occupancy-based live-load calculations.</p></div><div class="status"><span></span> BNBC 2020</div></header>
 
 <section id="loads" class="section active-section">
+<div class="code-banner"><div><b>Code basis</b><p>BNBC 2020 Part 6, Chapter 2: dead loads, live loads and strength-design load combinations.</p></div><span>SI</span></div>
 <div class="grid">
 <div class="card inputs">
-<div class="card-head"><div><h2>Load inputs</h2><p>Enter the dimensions and loads for your building element.</p></div><span class="badge">SI units</span></div>
+<div class="card-head"><div><h2>Load inputs</h2><p>Use actual project data where available; otherwise use applicable BNBC minimums.</p></div><span class="badge">BNBC 2020</span></div>
 
 <h3 class="group-title">Slab</h3>
 <div class="form-grid">
@@ -31,11 +32,31 @@
 <label>Concrete unit weight <div class="field"><input id="conc_w" type="number" value="24" min="0" step="0.1"><span>kN/m³</span></div></label>
 </div>
 
-<h3 class="group-title">Finishing</h3>
+<h3 class="group-title">Finishing & occupancy</h3>
 <div class="form-grid">
 <label>Finishing load <div class="field"><input id="finish" type="number" value="1.5" min="0" step="0.1"><span>kN/m²</span></div></label>
-<label>Live load <div class="field"><input id="live" type="number" value="2.0" min="0" step="0.1"><span>kN/m²</span></div></label>
+<label>Occupancy / use
+<div class="field select-field"><select id="occupancy">
+<option value="2.00" selected>Residential — other areas</option>
+<option value="1.50">Residential — sleeping areas</option>
+<option value="0.50">Residential — uninhabitable attic, no storage</option>
+<option value="1.00">Residential — uninhabitable attic, storage</option>
+<option value="4.80">Public rooms / corridors — hotel & multifamily</option>
+<option value="2.40">Office — offices</option>
+<option value="3.80">Office — corridors above first floor</option>
+<option value="4.80">Office — lobby / first-floor corridor</option>
+<option value="2.00">School — classroom</option>
+<option value="3.80">School — corridor above first floor</option>
+<option value="4.80">School — first-floor corridor</option>
+<option value="2.90">Hospital — operating / laboratory</option>
+<option value="2.00">Hospital — patient room</option>
+<option value="4.80">Restaurant / dining</option>
+<option value="4.80">Gymnasium</option>
+<option value="4.80">Stairs / exit ways</option>
+<option value="1.00">Ordinary flat roof</option>
+</select><span>kN/m²</span></div></label>
 </div>
+<div class="selected-load">Selected minimum live load: <b id="live_selected">2.00 kN/m²</b> <small>BNBC 2020 Table 6.2.3 / applicable roof table where selected</small></div>
 
 <h3 class="group-title">Beam</h3>
 <div class="form-grid">
@@ -48,41 +69,43 @@
 <div class="form-grid">
 <label>Wall thickness <div class="field"><input id="wall_t" type="number" value="125" min="1" step="5"><span>mm</span></div></label>
 <label>Wall height <div class="field"><input id="wall_h" type="number" value="3" min="0.1" step="0.1"><span>m</span></div></label>
-<label>Brick/block unit weight <div class="field"><input id="wall_w" type="number" value="20" min="0" step="0.5"><span>kN/m³</span></div></label>
+<label>Brick/block unit weight <div class="field"><input id="wall_w" type="number" value="18.9" min="0" step="0.1"><span>kN/m³</span></div></label>
 <label>Plaster load <div class="field"><input id="plaster" type="number" value="0.5" min="0" step="0.1"><span>kN/m²</span></div></label>
 </div>
 
 <button id="calculate" class="calculate">Calculate loads <span>→</span></button>
-<p class="hint">Preliminary gravity-load calculator. Concrete self-weight = thickness × unit weight. Wall load is calculated per metre run, including plaster on both faces.</p>
+<p class="hint">Wall load is per metre run and assumes plaster on both faces. The calculator does not automatically determine whether a wall is load-bearing; verify the structural system and actual wall materials.</p>
 </div>
 
 <div class="card results">
-<div class="card-head"><div><h2>Load output</h2><p>Results update when you change any input.</p></div></div>
+<div class="card-head"><div><h2>Load output</h2><p>Results update when inputs change.</p></div></div>
 <div class="result-list">
 <div class="result"><span>Slab self-weight</span><strong id="slab_out">—</strong><small>kN/m²</small></div>
 <div class="result"><span>Finishing load</span><strong id="finish_out">—</strong><small>kN/m²</small></div>
-<div class="result accent"><span>Total dead load</span><strong id="dead_out">—</strong><small>kN/m²</small></div>
-<div class="result"><span>Live load</span><strong id="live_out">—</strong><small>kN/m²</small></div>
+<div class="result accent"><span>Total dead load, D</span><strong id="dead_out">—</strong><small>kN/m²</small></div>
+<div class="result"><span>Live load, L</span><strong id="live_out">—</strong><small>kN/m²</small></div>
 <div class="result accent"><span>Total service load</span><strong id="service_out">—</strong><small>kN/m²</small></div>
 <div class="result"><span>Beam self-weight</span><strong id="beam_out">—</strong><small>kN/m</small></div>
 <div class="result"><span>Wall load</span><strong id="wall_out">—</strong><small>kN/m</small></div>
-<div class="result"><span>Factored slab load</span><strong id="factored_out">—</strong><small>kN/m²</small></div>
+<div class="result accent"><span>Factored: 1.4D</span><strong id="u14_out">—</strong><small>kN/m²</small></div>
+<div class="result accent"><span>Factored: 1.2D + 1.6L</span><strong id="u12_out">—</strong><small>kN/m²</small></div>
+<div class="result"><span>Governing factored load</span><strong id="factored_out">—</strong><small>kN/m²</small></div>
 </div>
-<div class="formula"><b>Load equations</b><span>Slab = t × γc &nbsp; • &nbsp; Wall = t × h × γ + plaster &nbsp; • &nbsp; wu = max(1.4D, 1.2D + 1.6L)</span></div>
+<div class="formula"><b>Calculation basis</b><span>Slab = t × γc &nbsp; • &nbsp; Wall = t × h × γ + 2h×plaster &nbsp; • &nbsp; wu = max(1.4D, 1.2D + 1.6L)</span><br><small>Strength-design combinations shown here are the gravity-only cases relevant to this calculator; wind, earthquake, roof live load, fluid, snow and other applicable effects require separate checks.</small></div>
 </div>
 </div>
 
 <div class="info-grid">
-<div class="info-card"><span>01</span><h3>Slab load</h3><p>Slab self-weight is automatically obtained from thickness and concrete unit weight.</p></div>
-<div class="info-card"><span>02</span><h3>Wall load</h3><p>Wall weight is reported per metre run and includes plaster on both faces.</p></div>
-<div class="info-card"><span>03</span><h3>Design use</h3><p>Use these preliminary loads as inputs for structural analysis after checking the project drawings and applicable code.</p></div>
+<div class="info-card"><span>01</span><h3>BNBC dead loads</h3><p>BNBC 2020 Table 6.2.1 gives unit weights of basic materials and Table 6.2.2 gives construction-material/member weights. Actual project data should govern when known.</p></div>
+<div class="info-card"><span>02</span><h3>BNBC live loads</h3><p>Minimum floor live load depends on occupancy/use. The selector uses values from BNBC 2020 Table 6.2.3 for common building uses.</p></div>
+<div class="info-card"><span>03</span><h3>Design warning</h3><p>This is an educational/preliminary calculator. Final structural design must include all applicable loads, combinations, member actions and detailing requirements.</p></div>
 </div>
 </section>
 
-<section id="beam" class="placeholder"><div class="empty"><b>RCC Beam</b><p>Beam flexural and shear design module can be added next.</p></div></section>
-<section id="column" class="placeholder"><div class="empty"><b>RCC Column</b><p>Column design module can be added next.</p></div></section>
-<section id="slab" class="placeholder"><div class="empty"><b>RCC Slab</b><p>One-way and two-way slab design module can be added next.</p></div></section>
-<footer>© 2026 Civil Engineering Load Calculator • Educational / preliminary calculations</footer>
+<section id="beam" class="placeholder"><div class="empty"><b>RCC Beam</b><p>BNBC 2020-based flexural, shear and detailing module will be added here.</p></div></section>
+<section id="column" class="placeholder"><div class="empty"><b>RCC Column</b><p>BNBC 2020-based axial load, interaction and detailing module will be added here.</p></div></section>
+<section id="slab" class="placeholder"><div class="empty"><b>RCC Slab</b><p>BNBC 2020-based one-way and two-way slab design module will be added here.</p></div></section>
+<footer>© 2026 Civil Engineering Load Calculator • BNBC 2020 educational / preliminary calculations</footer>
 </main></div>
 <script src="script.js"></script>
 </body></html>

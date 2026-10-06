@@ -1,92 +1,88 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="theme-color" content="#0b63ce">
-<title>Civil Engineering Design Workspace</title>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#0b63ce"><title>Civil Engineering Load Calculator</title>
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
 <div class="app">
-  <aside class="sidebar">
-    <div class="brand">
-      <div class="brand-mark">CE</div>
-      <div><strong>Civil Engineering</strong><span>Design Workspace</span></div>
-    </div>
-    <nav>
-      <button class="nav-item active" data-section="beam">▦ <span>RCC Beam</span></button>
-      <button class="nav-item" data-section="column">▥ <span>RCC Column</span></button>
-      <button class="nav-item" data-section="slab">▤ <span>RCC Slab</span></button>
-      <button class="nav-item" data-section="foundation">⌂ <span>Foundation</span></button>
-    </nav>
-    <div class="side-note">
-      <b>Engineering toolkit</b>
-      <p>Preliminary calculation workspace for learning and design development.</p>
-    </div>
-  </aside>
+<aside class="sidebar">
+<div class="brand"><div class="brand-mark">CE</div><div><strong>Civil Engineering</strong><span>Load Calculator</span></div></div>
+<nav>
+<button class="nav-item active" data-section="loads">▤ <span>Load Calculator</span></button>
+<button class="nav-item" data-section="beam">▦ <span>RCC Beam</span></button>
+<button class="nav-item" data-section="column">▥ <span>RCC Column</span></button>
+<button class="nav-item" data-section="slab">▤ <span>RCC Slab</span></button>
+</nav>
+<div class="side-note"><b>Engineering toolkit</b><p>Enter dimensions and material properties. The calculator updates the load results automatically.</p></div>
+</aside>
+<main class="main">
+<header class="topbar"><div><p class="eyebrow">CIVIL ENGINEERING • LOAD ANALYSIS</p><h1>Building Load Calculator</h1><p class="subtitle">Slab, beam, wall, finishing and live-load inputs with automatic load output.</p></div><div class="status"><span></span> Ready</div></header>
 
-  <main class="main">
-    <header class="topbar">
-      <div>
-        <p class="eyebrow">RCC DESIGN • BANGLADESH</p>
-        <h1>Beam Analysis</h1>
-        <p class="subtitle">Quick load, shear and bending-moment calculation for a simply supported RCC beam.</p>
-      </div>
-      <div class="status"><span></span> Ready</div>
-    </header>
+<section id="loads" class="section active-section">
+<div class="grid">
+<div class="card inputs">
+<div class="card-head"><div><h2>Load inputs</h2><p>Enter the dimensions and loads for your building element.</p></div><span class="badge">SI units</span></div>
 
-    <section id="beam" class="section active-section">
-      <div class="grid">
-        <div class="card inputs">
-          <div class="card-head"><div><h2>Beam inputs</h2><p>Enter project dimensions and loads.</p></div><span class="badge">SI units</span></div>
-          <div class="form-grid">
-            <label>Span, L <div class="field"><input id="L" type="number" value="6" min="0.1" step="0.1"><span>m</span></div></label>
-            <label>Width, b <div class="field"><input id="b" type="number" value="0.30" min="0.05" step="0.01"><span>m</span></div></label>
-            <label>Overall depth, h <div class="field"><input id="h" type="number" value="0.50" min="0.1" step="0.01"><span>m</span></div></label>
-            <label>Concrete, f′c <div class="field"><input id="fc" type="number" value="28" min="1" step="1"><span>MPa</span></div></label>
-            <label>Steel, fy <div class="field"><input id="fy" type="number" value="420" min="1" step="1"><span>MPa</span></div></label>
-            <label>Clear cover <div class="field"><input id="cover" type="number" value="25" min="0" step="1"><span>mm</span></div></label>
-            <label>Main bar diameter <div class="field"><input id="db" type="number" value="20" min="6" step="1"><span>mm</span></div></label>
-            <label>Stirrup diameter <div class="field"><input id="ds" type="number" value="10" min="6" step="1"><span>mm</span></div></label>
-            <label>Additional dead load <div class="field"><input id="Dadd" type="number" value="3" min="0" step="0.1"><span>kN/m</span></div></label>
-            <label>Live load <div class="field"><input id="LL" type="number" value="5" min="0" step="0.1"><span>kN/m</span></div></label>
-          </div>
-          <button id="calculate" class="calculate">Calculate design actions <span>→</span></button>
-          <p class="hint">Self-weight uses concrete unit weight = 24 kN/m³. Load combination: max(1.4D, 1.2D + 1.6L).</p>
-        </div>
-
-        <div class="card results">
-          <div class="card-head"><div><h2>Analysis results</h2><p>Calculated automatically from the inputs.</p></div></div>
-          <div class="result-list">
-            <div class="result"><span>Self-weight</span><strong id="sw">—</strong><small>kN/m</small></div>
-            <div class="result"><span>Total dead load, D</span><strong id="D">—</strong><small>kN/m</small></div>
-            <div class="result"><span>Factored load, wu</span><strong id="wu">—</strong><small>kN/m</small></div>
-            <div class="result accent"><span>Design moment, Mu</span><strong id="Mu">—</strong><small>kN·m</small></div>
-            <div class="result"><span>Design shear, Vu</span><strong id="Vu">—</strong><small>kN</small></div>
-            <div class="result"><span>Effective depth, d</span><strong id="d">—</strong><small>mm</small></div>
-          </div>
-          <div class="formula">
-            <b>Simply supported beam</b>
-            <span>Mu = wuL² / 8 &nbsp; • &nbsp; Vu = wuL / 2</span>
-          </div>
-        </div>
-      </div>
-
-      <div class="info-grid">
-        <div class="info-card"><span>01</span><h3>Load model</h3><p>Beam self-weight is calculated from b × h × 24 kN/m³ and combined with the additional dead and live loads.</p></div>
-        <div class="info-card"><span>02</span><h3>Design actions</h3><p>The calculator reports factored gravity load, maximum midspan moment and support shear for a simply supported idealisation.</p></div>
-        <div class="info-card"><span>03</span><h3>Next step</h3><p>Use Mu and Vu as starting actions for flexural and shear reinforcement design under the applicable code.</p></div>
-      </div>
-    </section>
-
-    <section id="column" class="placeholder"><div class="empty"><b>RCC Column</b><p>Column design workspace is ready for the next module.</p></div></section>
-    <section id="slab" class="placeholder"><div class="empty"><b>RCC Slab</b><p>Two-way and one-way slab design tools can be added here.</p></div></section>
-    <section id="foundation" class="placeholder"><div class="empty"><b>Foundation</b><p>Foundation design workspace is ready for future tools.</p></div></section>
-
-    <footer>© 2026 Civil Engineering Design Workspace • Educational / preliminary calculations</footer>
-  </main>
+<h3 class="group-title">Slab</h3>
+<div class="form-grid">
+<label>Slab thickness <div class="field"><input id="slab_t" type="number" value="150" min="1" step="1"><span>mm</span></div></label>
+<label>Concrete unit weight <div class="field"><input id="conc_w" type="number" value="24" min="0" step="0.1"><span>kN/m³</span></div></label>
 </div>
+
+<h3 class="group-title">Finishing</h3>
+<div class="form-grid">
+<label>Finishing load <div class="field"><input id="finish" type="number" value="1.5" min="0" step="0.1"><span>kN/m²</span></div></label>
+<label>Live load <div class="field"><input id="live" type="number" value="2.0" min="0" step="0.1"><span>kN/m²</span></div></label>
+</div>
+
+<h3 class="group-title">Beam</h3>
+<div class="form-grid">
+<label>Beam width, b <div class="field"><input id="beam_b" type="number" value="300" min="1" step="10"><span>mm</span></div></label>
+<label>Beam depth, h <div class="field"><input id="beam_h" type="number" value="500" min="1" step="10"><span>mm</span></div></label>
+<label>Beam length <div class="field"><input id="beam_L" type="number" value="6" min="0.1" step="0.1"><span>m</span></div></label>
+</div>
+
+<h3 class="group-title">Wall</h3>
+<div class="form-grid">
+<label>Wall thickness <div class="field"><input id="wall_t" type="number" value="125" min="1" step="5"><span>mm</span></div></label>
+<label>Wall height <div class="field"><input id="wall_h" type="number" value="3" min="0.1" step="0.1"><span>m</span></div></label>
+<label>Brick/block unit weight <div class="field"><input id="wall_w" type="number" value="20" min="0" step="0.5"><span>kN/m³</span></div></label>
+<label>Plaster load <div class="field"><input id="plaster" type="number" value="0.5" min="0" step="0.1"><span>kN/m²</span></div></label>
+</div>
+
+<button id="calculate" class="calculate">Calculate loads <span>→</span></button>
+<p class="hint">Preliminary gravity-load calculator. Concrete self-weight = thickness × unit weight. Wall load is calculated per metre run, including plaster on both faces.</p>
+</div>
+
+<div class="card results">
+<div class="card-head"><div><h2>Load output</h2><p>Results update when you change any input.</p></div></div>
+<div class="result-list">
+<div class="result"><span>Slab self-weight</span><strong id="slab_out">—</strong><small>kN/m²</small></div>
+<div class="result"><span>Finishing load</span><strong id="finish_out">—</strong><small>kN/m²</small></div>
+<div class="result accent"><span>Total dead load</span><strong id="dead_out">—</strong><small>kN/m²</small></div>
+<div class="result"><span>Live load</span><strong id="live_out">—</strong><small>kN/m²</small></div>
+<div class="result accent"><span>Total service load</span><strong id="service_out">—</strong><small>kN/m²</small></div>
+<div class="result"><span>Beam self-weight</span><strong id="beam_out">—</strong><small>kN/m</small></div>
+<div class="result"><span>Wall load</span><strong id="wall_out">—</strong><small>kN/m</small></div>
+<div class="result"><span>Factored slab load</span><strong id="factored_out">—</strong><small>kN/m²</small></div>
+</div>
+<div class="formula"><b>Load equations</b><span>Slab = t × γc &nbsp; • &nbsp; Wall = t × h × γ + plaster &nbsp; • &nbsp; wu = max(1.4D, 1.2D + 1.6L)</span></div>
+</div>
+</div>
+
+<div class="info-grid">
+<div class="info-card"><span>01</span><h3>Slab load</h3><p>Slab self-weight is automatically obtained from thickness and concrete unit weight.</p></div>
+<div class="info-card"><span>02</span><h3>Wall load</h3><p>Wall weight is reported per metre run and includes plaster on both faces.</p></div>
+<div class="info-card"><span>03</span><h3>Design use</h3><p>Use these preliminary loads as inputs for structural analysis after checking the project drawings and applicable code.</p></div>
+</div>
+</section>
+
+<section id="beam" class="placeholder"><div class="empty"><b>RCC Beam</b><p>Beam flexural and shear design module can be added next.</p></div></section>
+<section id="column" class="placeholder"><div class="empty"><b>RCC Column</b><p>Column design module can be added next.</p></div></section>
+<section id="slab" class="placeholder"><div class="empty"><b>RCC Slab</b><p>One-way and two-way slab design module can be added next.</p></div></section>
+<footer>© 2026 Civil Engineering Load Calculator • Educational / preliminary calculations</footer>
+</main></div>
 <script src="script.js"></script>
-</body>
-</html>
+</body></html>

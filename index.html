@@ -102,7 +102,57 @@
 </div>
 </section>
 
-<section id="beam" class="placeholder"><div class="empty"><b>RCC Beam</b><p>BNBC 2020-based flexural, shear and detailing module will be added here.</p></div></section>
+<section id="beam" class="section beam-section">
+<div class="code-banner"><div><b>RCC beam — 2D Stiffness Method</b><p>One-span Euler-Bernoulli beam analysis using the direct stiffness method. Analysis first; BNBC 2020 RCC design layer follows.</p></div><span>STIFFNESS</span></div>
+<div class="grid">
+<div class="card inputs">
+<div class="card-head"><div><h2>Beam stiffness inputs</h2><p>Global equation: [K]{Δ} = {P}</p></div><span class="badge">Direct Stiffness</span></div>
+<h3 class="group-title">Geometry & section</h3>
+<div class="form-grid">
+<label>Span, L <div class="field"><input id="bL" type="number" value="6" min="0.5" step="0.1"><span>m</span></div></label>
+<label>Beam width, b <div class="field"><input id="bb" type="number" value="300" min="50" step="10"><span>mm</span></div></label>
+<label>Beam depth, h <div class="field"><input id="bh" type="number" value="500" min="50" step="10"><span>mm</span></div></label>
+<label>Elastic modulus, E <div class="field"><input id="bE" type="number" value="24900" min="1000" step="100"><span>MPa</span></div></label>
+</div>
+<h3 class="group-title">Supports & loading</h3>
+<div class="form-grid">
+<label>Left support <div class="field"><select id="bLeft"><option value="pin" selected>Pin — v fixed, θ free</option><option value="fixed">Fixed — v, θ fixed</option></select></div></label>
+<label>Right support <div class="field"><select id="bRight"><option value="roller" selected>Roller — v fixed, θ free</option><option value="fixed">Fixed — v, θ fixed</option><option value="free">Free</option></select></div></label>
+<label>UDL, w <div class="field"><input id="bw" type="number" value="10" min="0" step="0.5"><span>kN/m</span></div></label>
+<label>Point load, P <div class="field"><input id="bP" type="number" value="0" min="0" step="1"><span>kN ↓</span></div></label>
+<label>Point-load position, a <div class="field"><input id="ba" type="number" value="3" min="0" step="0.1"><span>m from left</span></div></label>
+</div>
+<button id="beamCalculate" class="calculate">Run stiffness analysis <span>→</span></button>
+<p class="hint">The current engine is linear-elastic, prismatic and small-displacement. UDL and point load are vertical. For a real project, model all spans, loads and supports and complete BNBC 2020 design/detailing checks.</p>
+</div>
+<div class="card results">
+<div class="card-head"><div><h2>Stiffness analysis output</h2><p>Results are from the solved global system.</p></div></div>
+<div class="result-list">
+<div class="result accent"><span>Midspan displacement</span><strong id="bvmax">—</strong><small>mm</small></div>
+<div class="result"><span>Left reaction, R₁</span><strong id="br1">—</strong><small>kN</small></div>
+<div class="result"><span>Right reaction, R₂</span><strong id="br2">—</strong><small>kN</small></div>
+<div class="result accent"><span>Left end moment, M₁</span><strong id="bm1">—</strong><small>kN·m</small></div>
+<div class="result accent"><span>Right end moment, M₂</span><strong id="bm2">—</strong><small>kN·m</small></div>
+<div class="result"><span>Maximum |moment|</span><strong id="bMmax">—</strong><small>kN·m</small></div>
+<div class="result"><span>Maximum |shear|</span><strong id="bVmax">—</strong><small>kN</small></div>
+</div>
+<div class="formula"><b>Element stiffness matrix</b><span>k = EI/L³ × [[12, 6L, −12, 6L], [6L, 4L², −6L, 2L²], [−12, −6L, 12, −6L], [6L, 2L², −6L, 4L²]]</span><br><small>The matrix is assembled with DOF order [v₁, θ₁, v₂, θ₂].</small></div>
+</div>
+</div>
+<div class="matrix-card">
+<div class="matrix-head"><div><h2>Global stiffness solution</h2><p>Units: K terms are consistent with kN, m and radians; displacements are reported in m/rad.</p></div></div>
+<div class="matrix-grid">
+<div><h3>K matrix</h3><pre id="bK">—</pre></div>
+<div><h3>Load vector P</h3><pre id="bPvec">—</pre></div>
+<div><h3>Displacement vector Δ</h3><pre id="bD">—</pre></div>
+</div>
+</div>
+<div class="info-grid">
+<div class="info-card"><span>01</span><h3>What changed?</h3><p>The beam no longer assumes M=wL²/8. Stiffness is obtained from EI/L and the support constraints determine the actual actions.</p></div>
+<div class="info-card"><span>02</span><h3>Next design layer</h3><p>Next, the solved Mu and Vu will feed a BNBC 2020 RCC beam flexural/shear and reinforcement-detailing module.</p></div>
+<div class="info-card"><span>03</span><h3>Advanced path</h3><p>Multiple spans, frame geometry, column stiffness, load cases, combinations and P-Δ analysis can be added after this single-member engine is verified.</p></div>
+</div>
+</section>
 <section id="column" class="placeholder"><div class="empty"><b>RCC Column</b><p>BNBC 2020-based axial load, interaction and detailing module will be added here.</p></div></section>
 <section id="slab" class="section slab-section">
 <div class="code-banner"><div><b>RCC slab design — BNBC 2020</b><p>One-way slab preliminary design using strength design. Check the complete structural system and applicable detailing before construction.</p></div><span>SI</span></div>

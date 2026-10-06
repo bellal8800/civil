@@ -18,6 +18,65 @@ function slabDesign(){
  $("svu").textContent=Vu.toFixed(2);$("svc").textContent=phiVc.toFixed(2);
  $("svstatus").textContent=phiVc>=Vu?"OK — shear capacity adequate":"NOT OK — increase thickness / redesign";
 }
+
+function solveLinear(A,b){
+ const n=b.length,M=A.map((r,i)=>r.slice().concat([b[i]]));
+ for(let k=0;k<n;k++){
+  let p=k;for(let i=k+1;i<n;i++)if(Math.abs(M[i][k])>Math.abs(M[p][k]))p=i;
+  if(Math.abs(M[p][k])<1e-12)throw new Error("Singular stiffness matrix — check supports.");
+  [M[k],M[p]]=[M[p],M[k]];
+  for(let i=k+1;i<n;i++){const q=M[i][k]/M[k][k];for(let j=k;j<=n;j++)M[i][j]-=q*M[k][j];}
+ }
+ const x=Array(n).fill(0);
+ for(let i=n-1;i>=0;i--){let s=M[i][n];for(let j=i+1;j<n;j++)s-=M[i][j]*x[j];x[i]=s/M[i][i];}
+ return x;
+}
+function fmtMatrix(A,d=3){return A.map(r=>r.map(v=>Number(v).toFixed(d)).join("   ")).join("\n")}
+function beamStiffness(){
+ try{
+  const L=num("bL"),b=num("bb")/1000,h=num("bh")/1000,E=num("bE")*1000,w=num("bw"),P=num("bP"),a=Math.min(L,Math.max(0,num("ba")));
+  if(L<=0||b<=0||h<=0||E<=0)throw new Error("Check geometry and E.");
+  const I=b*Math.pow(h,3)/12,EI=E*I;
+  const c=EI/Math.pow(L,3),K=[
+   [12*c,6*L*c,-12*c,6*L*c],
+   [6*L*c,4*L*L*c,-6*L*c,2*L*L*c],
+   [-12*c,-6*L*c,12*c,-6*L*c],
+   [6*L*c,2*L*L*c,-6*L*c,4*L*L*c]
+  ];
+  const F=[-w*L/2,-w*L*L/12,-w*L/2,w*L*L/12];
+  if(P>0){const xi=a/L,Fp=[-P*(1-xi),-P*a*(1-xi),-P*xi,-P*a*xi];for(let i=0;i<4;i++)F[i]+=Fp[i]}
+  const fixed=[];
+  if(numSupport("bLeft")==="fixed"){fixed.push(0,1)}else fixed.push(0);
+  if(numSupport("bRight")==="fixed"){fixed.push(2,3)}else if(numSupport("bRight")==="roller"){fixed.push(2)}
+  const free=[0,1,2,3].filter(i=>!fixed.includes(i)),Kr=free.map(i=>free.map(j=>K[i][j])),Fr=free.map(i=>F[i]);
+  const d=Array(4).fill(0),dr=solveLinear(Kr,Fr);free.forEach((i,n)=>d[i]=dr[n]);
+  const reactions=K.map((r,i)=>r.reduce((s,v,j)=>s+v*d[j],0)-F[i]);
+  const r1=-reactions[0],r2=-reactions[2];
+  const samples=80,pts=[];let maxM=0,maxV=0,maxDef=0,midDef=0;
+  for(let i=0;i<=samples;i++){const x=L*i/samples,V=r1-w*x-(x>=a?P:0),M=r1*x-w*x*x/2-(x>=a?P*(x-a):0);pts.push({x,V,M});maxM=Math.max(maxM,Math.abs(M));maxV=Math.max(maxV,Math.abs(V));if(Math.abs(x-L/2)<L/samples)midDef=Math.abs(d[0]+(d[2]-d[0])*.5)}
+  maxDef=Math.max(...pts.map((_,i)=>Math.abs(d[0]+(d[2]-d[0])*i/samples)));
+  $("bvmax").textContent=(maxDef*1000).toFixed(3);
+  $("br1").textContent=r1.toFixed(2);$("br2").textContent=r2.toFixed(2);
+  $("bm1").textContent=pts[0].M.toFixed(2);$("bm2").textContent=pts[pts.length-1].M.toFixed(2);
+  $("bMmax").textContent=maxM.toFixed(2);$("bVmax").textContent=maxV.toFixed(2);
+  $("bK").textContent=fmtMatrix(K,2);$("bPvec").textContent=F.map(v=>v.toFixed(3)).join("\n");$("bD").textContent=d.map(v=>v.toFixed(8)).join("\n");
+  let old=document.getElementById("bDiagram");if(old)old.remove();
+  const wrap=document.createElement("div");wrap.className="diagram-card";wrap.id="bDiagram";
+  wrap.innerHTML="<h2>Shear Force & Bending Moment</h2><p>Sign convention: positive shear upward on the left cut; positive sagging moment.</p><div class='charts'><div><h3>SFD</h3><canvas id='sfdCanvas' width='760' height='240'></canvas></div><div><h3>BMD</h3><canvas id='bmdCanvas' width='760' height='240'></canvas></div></div>";
+  document.querySelector(".matrix-card").after(wrap);drawBeamChart("sfdCanvas",pts,"V","Shear (kN)");drawBeamChart("bmdCanvas",pts,"M","Moment (kN·m)");
+ }catch(e){alert(e.message)}
+}
+function numSupport(id){return $(id).value}
+function drawBeamChart(id,pts,key,label){
+ const c=$(id),ctx=c.getContext("2d"),W=c.width,H=c.height,pad=42;
+ ctx.clearRect(0,0,W,H);ctx.strokeStyle="#cfd8e4";ctx.lineWidth=1;
+ const vals=pts.map(p=>p[key]),max=Math.max(...vals.map(Math.abs),1),x0=pad,x1=W-pad,y0=H/2,scale=(H*.38)/max;
+ ctx.beginPath();ctx.moveTo(x0,y0);ctx.lineTo(x1,y0);ctx.stroke();
+ ctx.strokeStyle="#1674e8";ctx.lineWidth=2;ctx.beginPath();
+ pts.forEach((p,i)=>{const x=x0+(x1-x0)*i/(pts.length-1),y=y0-p[key]*scale;if(i)ctx.lineTo(x,y);else ctx.moveTo(x,y)});ctx.stroke();
+ ctx.fillStyle="#66758a";ctx.font="11px system-ui";ctx.fillText("0",8,y0+4);ctx.fillText(max.toFixed(1),8,y0-scale+4);ctx.fillText((-max).toFixed(1),2,y0+scale+4);ctx.fillText(label,x0,18);ctx.fillText("0",x0-4,H-12);ctx.fillText(pts[pts.length-1].x.toFixed(2)+" m",x1-35,H-12);
+}
+
 function calculate(){
  const t=num("slab_t")/1000,gc=num("conc_w"),finish=num("finish"),live=num("occupancy");
  const bb=num("beam_b")/1000,bh=num("beam_h")/1000;
@@ -39,6 +98,8 @@ function calculate(){
  $("live_selected").textContent=live.toFixed(2)+" kN/m²";
 }
 $("calculate").addEventListener("click",calculate);
+$("beamCalculate").addEventListener("click",beamStiffness);
+document.querySelectorAll("#beam input,#beam select").forEach(i=>i.addEventListener("input",beamStiffness));
 $("slabCalculate").addEventListener("click",slabDesign);
 document.querySelectorAll("#slab input,#slab select").forEach(i=>i.addEventListener("input",slabDesign));
 document.querySelectorAll("input,select").forEach(i=>i.addEventListener("input",calculate));

@@ -104,7 +104,59 @@
 
 <section id="beam" class="placeholder"><div class="empty"><b>RCC Beam</b><p>BNBC 2020-based flexural, shear and detailing module will be added here.</p></div></section>
 <section id="column" class="placeholder"><div class="empty"><b>RCC Column</b><p>BNBC 2020-based axial load, interaction and detailing module will be added here.</p></div></section>
-<section id="slab" class="placeholder"><div class="empty"><b>RCC Slab</b><p>BNBC 2020-based one-way and two-way slab design module will be added here.</p></div></section>
+<section id="slab" class="section slab-section">
+<div class="code-banner"><div><b>RCC slab design — BNBC 2020</b><p>One-way slab preliminary design using strength design. Check the complete structural system and applicable detailing before construction.</p></div><span>SI</span></div>
+<div class="grid">
+<div class="card inputs">
+<div class="card-head"><div><h2>One-way slab inputs</h2><p>Design a 1 m wide strip of slab.</p></div><span class="badge">BNBC 2020</span></div>
+<h3 class="group-title">Geometry & materials</h3>
+<div class="form-grid">
+<label>Clear span, L <div class="field"><input id="sL" type="number" value="4.0" min="0.5" step="0.1"><span>m</span></div></label>
+<label>Slab thickness, h <div class="field"><input id="sh" type="number" value="150" min="50" step="5"><span>mm</span></div></label>
+<label>Concrete strength, f'c <div class="field"><input id="sfc" type="number" value="28" min="17" step="1"><span>MPa</span></div></label>
+<label>Steel yield strength, fy <div class="field"><input id="sfy" type="number" value="420" min="275" step="5"><span>MPa</span></div></label>
+<label>Clear cover <div class="field"><input id="scover" type="number" value="20" min="10" step="1"><span>mm</span></div></label>
+<label>Main bar diameter <div class="field"><input id="sbar" type="number" value="10" min="6" step="1"><span>mm</span></div></label>
+</div>
+<h3 class="group-title">Loads</h3>
+<div class="form-grid">
+<label>Finishing load <div class="field"><input id="sfinish" type="number" value="1.5" min="0" step="0.1"><span>kN/m²</span></div></label>
+<label>Live load <div class="field"><input id="slive" type="number" value="2.0" min="0" step="0.1"><span>kN/m²</span></div></label>
+<label>Other dead load <div class="field"><input id="sother" type="number" value="0" min="0" step="0.1"><span>kN/m²</span></div></label>
+</div>
+<h3 class="group-title">Analysis model</h3>
+<div class="form-grid">
+<label>Support condition <div class="field"><select id="support"><option value="0.125">Simply supported — M=wL²/8</option><option value="0.0625">Continuous positive — M=wL²/16</option><option value="0.0833333">Conservative positive — M=wL²/12</option><option value="0.5">Cantilever — M=wL²/2</option></select></div></label>
+<label>Shear coefficient <div class="field"><input id="vcoef" type="number" value="0.5" min="0.1" max="1" step="0.01"><span>Vu=wL×coef</span></div></label>
+</div>
+<button id="slabCalculate" class="calculate">Design one-way slab <span>→</span></button>
+<p class="hint">For continuous slabs, the selected moment coefficient is an analysis assumption for this preliminary tool—not a substitute for frame analysis or a complete code moment-distribution procedure.</p>
+</div>
+<div class="card results">
+<div class="card-head"><div><h2>Slab design output</h2><p>Calculated for a 1,000 mm design strip.</p></div></div>
+<div class="result-list">
+<div class="result"><span>Self-weight</span><strong id="ssw">—</strong><small>kN/m²</small></div>
+<div class="result"><span>Total dead load, D</span><strong id="sd">—</strong><small>kN/m²</small></div>
+<div class="result"><span>Factored load, wu</span><strong id="swu">—</strong><small>kN/m²</small></div>
+<div class="result accent"><span>Design moment, Mu</span><strong id="smu">—</strong><small>kN·m/m</small></div>
+<div class="result"><span>Effective depth, d</span><strong id="sddep">—</strong><small>mm</small></div>
+<div class="result"><span>Required flexural As</span><strong id="sasreq">—</strong><small>mm²/m</small></div>
+<div class="result accent"><span>Minimum slab As</span><strong id="sasmin">—</strong><small>mm²/m</small></div>
+<div class="result"><span>Governing As</span><strong id="sasgov">—</strong><small>mm²/m</small></div>
+<div class="result accent"><span>Provide main steel</span><strong id="sprovide">—</strong><small>mm²/m</small></div>
+<div class="result"><span>Design shear, Vu</span><strong id="svu">—</strong><small>kN</small></div>
+<div class="result"><span>Concrete shear capacity, φVc</span><strong id="svc">—</strong><small>kN</small></div>
+<div class="result accent"><span>Shear status</span><strong id="svstatus">—</strong><small></small></div>
+</div>
+<div class="formula"><b>BNBC design checks</b><span>As,min = 0.0018bh for fy = 420 MPa; maximum main-bar spacing ≤ min(3h, 450 mm). Flexure uses φ=0.90 and rectangular stress-block equilibrium. Shear is a preliminary one-way check.</span></div>
+</div>
+</div>
+<div class="info-grid">
+<div class="info-card"><span>01</span><h3>Thickness</h3><p>The tool reports a preliminary span/thickness ratio check. Final thickness must satisfy the applicable BNBC slab provisions and deflection requirements.</p></div>
+<div class="info-card"><span>02</span><h3>Reinforcement</h3><p>The governing flexural steel is the larger of calculated steel and the BNBC shrinkage/temperature minimum. Bar spacing is checked against the slab spacing limit.</p></div>
+<div class="info-card"><span>03</span><h3>Next upgrade</h3><p>Two-way slab design, column-strip/middle-strip distribution, negative reinforcement, development length and reinforcement plan will be added next.</p></div>
+</div>
+</section>
 <footer>© 2026 Civil Engineering Load Calculator • BNBC 2020 educational / preliminary calculations</footer>
 </main></div>
 <script src="script.js"></script>

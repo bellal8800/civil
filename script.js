@@ -32,6 +32,35 @@ function solveLinear(A,b){
  return x;
 }
 function fmtMatrix(A,d=3){return A.map(r=>r.map(v=>Number(v).toFixed(d)).join("   ")).join("\n")}
+
+let lastBeamResult=null;
+function beamDesign(){
+ try{
+  if(!lastBeamResult)beamStiffness();
+  const fc=num("bfc"),fy=num("bfy"),cover=num("bcover"),db=num("bbar"),ds=num("bstir"),b=num("bb"),h=num("bh");
+  const Mu=lastBeamResult.Mu,Vu=lastBeamResult.Vu,d=h-cover-ds-db/2,phi=.90;
+  const R=Mu*1e6/(phi*b*d*d),disc=1-2*R/(0.85*fc);
+  if(d<=0||disc<0)throw new Error("Section depth/material inputs are outside this preliminary design model.");
+  const As=(0.85*fc*b/fy)*(d-d*Math.sqrt(disc));
+  const Asmin=Math.max(1.4/fy*b*d,0.25*Math.sqrt(fc)/fy*b*d);
+  const Asg=Math.max(As,Asmin);
+  const area=Math.PI*db*db/4;
+  let n=Math.max(2,Math.ceil(Asg/area)),Aprov=n*area;
+  const Vc=0.17*Math.sqrt(fc)*b*d/1000,phiVc=.75*Vc;
+  const Vs=Math.max(0,Vu/0.75-Vc);
+  const Asv=2*Math.PI*ds*ds/4;
+  let s=Vs>0 ? Asv*fy*d/(Vs*1000) : 9999;
+  const smax=Math.min(d/2,600);
+  s=Math.max(75,Math.floor(Math.min(s,smax)/25)*25);
+  $("dMu").textContent=Mu.toFixed(2);$("dVu").textContent=Vu.toFixed(2);$("dd").textContent=d.toFixed(1);
+  $("dAs").textContent=As.toFixed(0);$("dAsmin").textContent=Asmin.toFixed(0);
+  $("dBars").textContent=n+"Ø"+db; $("dAsprov").textContent=Aprov.toFixed(0);
+  $("dVc").textContent=phiVc.toFixed(2);
+  $("dStir").textContent=Vs<=0?"Ø"+ds+" 2-leg @ "+smax.toFixed(0)+" mm max":"Ø"+ds+" 2-leg @ "+s+" mm c/c";
+  $("dSmax").textContent=smax.toFixed(0);
+ }catch(e){alert(e.message)}
+}
+
 function beamStiffness(){
  try{
   const L=num("bL"),b=num("bb")/1000,h=num("bh")/1000,E=num("bE")*1000,w=num("bw"),P=num("bP"),a=Math.min(L,Math.max(0,num("ba")));
@@ -55,6 +84,7 @@ function beamStiffness(){
   const samples=80,pts=[];let maxM=0,maxV=0,maxDef=0,midDef=0;
   for(let i=0;i<=samples;i++){const x=L*i/samples,V=r1-w*x-(x>=a?P:0),M=r1*x-w*x*x/2-(x>=a?P*(x-a):0);pts.push({x,V,M});maxM=Math.max(maxM,Math.abs(M));maxV=Math.max(maxV,Math.abs(V));if(Math.abs(x-L/2)<L/samples)midDef=Math.abs(d[0]+(d[2]-d[0])*.5)}
   maxDef=Math.max(...pts.map((_,i)=>Math.abs(d[0]+(d[2]-d[0])*i/samples)));
+  lastBeamResult={Mu:maxM,Vu:maxV};
   $("bvmax").textContent=(maxDef*1000).toFixed(3);
   $("br1").textContent=r1.toFixed(2);$("br2").textContent=r2.toFixed(2);
   $("bm1").textContent=pts[0].M.toFixed(2);$("bm2").textContent=pts[pts.length-1].M.toFixed(2);
@@ -99,6 +129,7 @@ function calculate(){
 }
 $("calculate").addEventListener("click",calculate);
 $("beamCalculate").addEventListener("click",beamStiffness);
+$("beamDesign").addEventListener("click",beamDesign);
 document.querySelectorAll("#beam input,#beam select").forEach(i=>i.addEventListener("input",beamStiffness));
 $("slabCalculate").addEventListener("click",slabDesign);
 document.querySelectorAll("#slab input,#slab select").forEach(i=>i.addEventListener("input",slabDesign));

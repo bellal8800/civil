@@ -152,7 +152,31 @@
 <div class="info-card"><span>02</span><h3>Next design layer</h3><p>Next, the solved Mu and Vu will feed a BNBC 2020 RCC beam flexural/shear and reinforcement-detailing module.</p></div>
 <div class="info-card"><span>03</span><h3>Advanced path</h3><p>Multiple spans, frame geometry, column stiffness, load cases, combinations and P-Δ analysis can be added after this single-member engine is verified.</p></div>
 </div>
-</section>
+<div class="matrix-card beam-design">
+<div class="matrix-head"><div><h2>BNBC 2020 RCC Beam Design</h2><p>Design is based on the governing stiffness-analysis Mu and Vu above.</p></div><span class="badge">PRELIMINARY</span></div>
+<h3 class="group-title">Materials & detailing inputs</h3>
+<div class="form-grid">
+<label>Concrete strength, f'c <div class="field"><input id="bfc" type="number" value="28" min="17" step="1"><span>MPa</span></div></label>
+<label>Steel yield, fy <div class="field"><input id="bfy" type="number" value="420" min="275" step="5"><span>MPa</span></div></label>
+<label>Clear cover <div class="field"><input id="bcover" type="number" value="40" min="20" step="5"><span>mm</span></div></label>
+<label>Trial tension bar Ø <div class="field"><input id="bbar" type="number" value="20" min="10" step="2"><span>mm</span></div></label>
+<label>Stirrup Ø <div class="field"><input id="bstir" type="number" value="10" min="6" step="2"><span>mm</span></div></label>
+</div>
+<button id="beamDesign" class="calculate">Design reinforcement <span>→</span></button>
+<div class="result-list" style="margin-top:18px">
+<div class="result accent"><span>Design moment, Mu</span><strong id="dMu">—</strong><small>kN·m</small></div>
+<div class="result accent"><span>Design shear, Vu</span><strong id="dVu">—</strong><small>kN</small></div>
+<div class="result"><span>Effective depth, d</span><strong id="dd">—</strong><small>mm</small></div>
+<div class="result"><span>Required tension As</span><strong id="dAs">—</strong><small>mm²</small></div>
+<div class="result accent"><span>Minimum As</span><strong id="dAsmin">—</strong><small>mm²</small></div>
+<div class="result accent"><span>Provide bottom steel</span><strong id="dBars">—</strong><small></small></div>
+<div class="result"><span>Provided As</span><strong id="dAsprov">—</strong><small>mm²</small></div>
+<div class="result"><span>Nominal shear capacity φVc</span><strong id="dVc">—</strong><small>kN</small></div>
+<div class="result accent"><span>Stirrups</span><strong id="dStir">—</strong><small></small></div>
+<div class="result"><span>Max stirrup spacing</span><strong id="dSmax">—</strong><small>mm</small></div>
+</div>
+<div class="formula"><b>Design basis</b><span>Rectangular-section flexure uses a Whitney stress block and φ=0.90. Minimum beam steel, shear and stirrup limits shown are preliminary and must be verified against the exact BNBC 2020 provisions applicable to the project.</span></div>
+</div></section>
 <section id="column" class="placeholder"><div class="empty"><b>RCC Column</b><p>BNBC 2020-based axial load, interaction and detailing module will be added here.</p></div></section>
 <section id="slab" class="section slab-section">
 <div class="code-banner"><div><b>RCC slab design — BNBC 2020</b><p>One-way slab preliminary design using strength design. Check the complete structural system and applicable detailing before construction.</p></div><span>SI</span></div>

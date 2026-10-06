@@ -44,14 +44,14 @@ function beamStiffness(){
    [6*L*c,2*L*L*c,-6*L*c,4*L*L*c]
   ];
   const F=[-w*L/2,-w*L*L/12,-w*L/2,w*L*L/12];
-  if(P>0){const xi=a/L,Fp=[-P*(1-xi),-P*a*(1-xi),-P*xi,-P*a*xi];for(let i=0;i<4;i++)F[i]+=Fp[i]}
+  if(P>0){const xi=a/L,Fp=[-P*(1-3*xi*xi+2*xi*xi*xi),-P*L*xi*(1-xi)*(1-xi),-P*(3*xi*xi-2*xi*xi*xi),P*L*xi*xi*(1-xi)];for(let i=0;i<4;i++)F[i]+=Fp[i]}
   const fixed=[];
   if(numSupport("bLeft")==="fixed"){fixed.push(0,1)}else fixed.push(0);
   if(numSupport("bRight")==="fixed"){fixed.push(2,3)}else if(numSupport("bRight")==="roller"){fixed.push(2)}
   const free=[0,1,2,3].filter(i=>!fixed.includes(i)),Kr=free.map(i=>free.map(j=>K[i][j])),Fr=free.map(i=>F[i]);
   const d=Array(4).fill(0),dr=solveLinear(Kr,Fr);free.forEach((i,n)=>d[i]=dr[n]);
   const reactions=K.map((r,i)=>r.reduce((s,v,j)=>s+v*d[j],0)-F[i]);
-  const r1=-reactions[0],r2=-reactions[2];
+  const r1=reactions[0],r2=reactions[2];
   const samples=80,pts=[];let maxM=0,maxV=0,maxDef=0,midDef=0;
   for(let i=0;i<=samples;i++){const x=L*i/samples,V=r1-w*x-(x>=a?P:0),M=r1*x-w*x*x/2-(x>=a?P*(x-a):0);pts.push({x,V,M});maxM=Math.max(maxM,Math.abs(M));maxV=Math.max(maxV,Math.abs(V));if(Math.abs(x-L/2)<L/samples)midDef=Math.abs(d[0]+(d[2]-d[0])*.5)}
   maxDef=Math.max(...pts.map((_,i)=>Math.abs(d[0]+(d[2]-d[0])*i/samples)));

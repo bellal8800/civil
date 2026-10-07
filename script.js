@@ -355,3 +355,24 @@ function drawReinforcementOverlay(){
  }
  ctx.restore();
 }
+
+function drawBeamDetailing(){
+ const c=$("beamModelCanvas");if(!c||!window.lastContinuousDesign)return;
+ const ctx=c.getContext("2d"),g=graphCanvasGeometry(),nodes=cadNodes.slice().sort((a,b)=>a.x-b.x),D=window.lastContinuousDesign,y=g.y;
+ ctx.save();ctx.lineWidth=2;ctx.font="10px system-ui";
+ for(let i=0;i<nodes.length-1;i++){const x1=g.x1+nodes[i].x/g.L*g.s,x2=g.x1+nodes[i+1].x/g.L*g.s,bd=D.designs[i];
+  ctx.beginPath();ctx.moveTo(x1+10,y+5);ctx.lineTo(x2-10,y+5);ctx.stroke();ctx.fillText("B"+bd.bottom.n+"Ø"+D.db,(x1+x2)/2-22,y+34);
+  ctx.setLineDash([3,3]);ctx.beginPath();ctx.moveTo(x1+8,y-16);ctx.lineTo(Math.min(x1+60,x2-20),y-16);ctx.stroke();ctx.beginPath();ctx.moveTo(Math.max(x2-60,x1+20),y-16);ctx.lineTo(x2-8,y-16);ctx.stroke();ctx.setLineDash([]);
+  ctx.fillText("STIRRUP ZONE",x1+12,y-22);
+ }
+ for(let i=1;i<nodes.length-1;i++){const x=g.x1+nodes[i].x/g.L*g.s,bd=D.designs[i-1];ctx.beginPath();ctx.moveTo(x-45,y-5);ctx.lineTo(x+45,y-5);ctx.stroke();ctx.fillText("T"+bd.top.n+"Ø"+D.db,x-25,y-19);}
+ ctx.restore();
+}
+function showDetailingSchedule(){
+ if(!window.lastContinuousDesign)return;const D=window.lastContinuousDesign;
+ let p=document.getElementById("detailingSchedule");
+ if(!p){p=document.createElement("div");p.id="detailingSchedule";p.className="graph-summary";document.querySelector(".property-panel")?.appendChild(p)}
+ p.innerHTML="<b>BAR SCHEDULE • PRELIMINARY</b>"+D.designs.map(x=>"<span>Span "+x.span+": B"+x.bottom.n+"Ø"+D.db+" bottom; top over internal support; closer stirrup zones near supports</span>").join("");
+}
+const _drawGraphModelBase=drawGraphModel;
+drawGraphModel=function(){_drawGraphModelBase();if(window.lastContinuousDesign){drawBeamDetailing();showDetailingSchedule();}};

@@ -310,3 +310,48 @@ const oldGraphDraw=drawGraphModel;
 drawGraphModel=function(){oldGraphDraw();graphicalResultsOverlay()};
 const oldAnalyzeCad=$("cadAnalyze");
 if(oldAnalyzeCad){oldAnalyzeCad.onclick=()=>analyzeGraphicalModel()}
+
+function designGraphicalContinuousBeam(){
+ try{
+  analyzeGraphicalModel();
+  const fc=num("bfc")||28,fy=num("bfy")||420,cover=num("bcover")||40,db=num("bbar")||16,ds=num("bstir")||8;
+  const b=num("bb"),h=num("bh"),d=h-cover-ds-db/2,phi=.90,area=Math.PI*db*db/4;
+  if(d<=0)throw new Error("Invalid beam effective depth.");
+  const spans=(lastBeamResult&&lastBeamResult.spans)||[];
+  const amin=Math.max(1.4/fy*b*d,.25*Math.sqrt(fc)/fy*b*d);
+  const designs=spans.map((sp,i)=>{
+   const pos=Math.max(0,Number(sp.maxPositiveMoment||sp.Mpos||0));
+   const neg=Math.max(0,Number(sp.maxNegativeMoment||Math.abs(sp.Mneg||0)));
+   function calc(M){
+    const R=M*1e6/(phi*b*d*d),disc=1-2*R/(.85*fc);
+    if(disc<0)return {n:2,As:2*area,over:true};
+    const req=Math.max((.85*fc*b/fy)*(d-d*Math.sqrt(disc)),amin);
+    const n=Math.max(2,Math.ceil(req/area));
+    return {n,As:n*area,over:false};
+   }
+   return {span:i+1,bottom:calc(pos),top:calc(neg)};
+  });
+  window.lastContinuousDesign={fc,fy,b,h,d,db,ds,designs};
+  const p=document.querySelector(".property-panel");
+  if(p){let x=document.getElementById("continuousDesign");if(!x){x=document.createElement("div");x.id="continuousDesign";x.className="graph-summary";p.appendChild(x)}
+   x.innerHTML="<b>PRELIMINARY RCC REINFORCEMENT</b>"+designs.map(v=>"<span>Span "+v.span+" • Bottom "+v.bottom.n+"Ø"+db+" • Top "+v.top.n+"Ø"+db+"</span>").join("");
+  }
+  setCadMode("design");drawReinforcementOverlay();
+ }catch(e){alert(e.message)}
+}
+function drawReinforcementOverlay(){
+ const c=$("beamModelCanvas");if(!c||!window.lastContinuousDesign)return;
+ const ctx=c.getContext("2d"),g=graphCanvasGeometry(),nodes=cadNodes.slice().sort((a,b)=>a.x-b.x);
+ ctx.save();ctx.lineWidth=3;ctx.font="bold 10px system-ui";
+ for(let i=0;i<nodes.length-1;i++){
+  const x1=g.x1+nodes[i].x/g.L*g.s,x2=g.x1+nodes[i+1].x/g.L*g.s;
+  ctx.beginPath();ctx.moveTo(x1+12,g.y+10);ctx.lineTo(x2-12,g.y+10);ctx.stroke();
+  ctx.fillText("BOTTOM +M",(x1+x2)/2-30,g.y+27);
+ }
+ for(let i=1;i<nodes.length-1;i++){
+  const x=g.x1+nodes[i].x/g.L*g.s;
+  ctx.beginPath();ctx.moveTo(x-24,g.y-9);ctx.lineTo(x+24,g.y-9);ctx.stroke();
+  ctx.fillText("TOP −M",x-25,g.y-22);
+ }
+ ctx.restore();
+}

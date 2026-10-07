@@ -249,7 +249,8 @@ function graphClick(ev){
    else addGraphJoint(p.x);
    syncGraphModel();drawGraphModel();
  }else if(cadMode==="loads"){
-   if(p.py>y-100 && p.py<y+45 && p.x>=0&&p.x<=L){
+   const gg=graphCanvasGeometry();
+   if(p.py>gg.y-100 && p.py<gg.y+45 && p.x>=0&&p.x<=gg.L){
      const P=Number(prompt("Point load P (kN)",num("bP")||10));
      if(Number.isFinite(P)&&P>0){cadPointLoads.push({P,x:p.x});$("bP").value=P;$("ba").value=p.x.toFixed(2);beamStiffness()}
      rebuildGraphTree();drawGraphModel();
@@ -258,7 +259,8 @@ function graphClick(ev){
  else if(cadMode==="design"){beamDesign();drawGraphModel()}
 }
 drawBeamModel=function(){syncGraphModel();drawGraphModel();};
-if(cadCanvas){cadCanvas.removeEventListener("click",handleCadCanvasClick);cadCanvas.addEventListener("click",graphClick)}
+const cadCanvas=$("beamModelCanvas");
+if(cadCanvas){cadCanvas.addEventListener("click",graphClick)}
 document.querySelectorAll(".cad-toolbar .tool[data-cad]").forEach(b=>b.addEventListener("click",()=>{setCadMode(b.dataset.cad);rebuildGraphTree()}));
 const modelBtn=document.querySelector(".cad-toolbar .tool[data-cad='model']");
 if(modelBtn)modelBtn.title="Model: click empty canvas to create joints; click joint to cycle support";

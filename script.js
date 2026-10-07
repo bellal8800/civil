@@ -376,3 +376,19 @@ function showDetailingSchedule(){
 }
 const _drawGraphModelBase=drawGraphModel;
 drawGraphModel=function(){_drawGraphModelBase();if(window.lastContinuousDesign){drawBeamDetailing();showDetailingSchedule();}};
+
+/* Load Calculator point interface */
+function initLoadPoints(){
+ const sec=document.getElementById("loads"); if(!sec)return;
+ const card=sec.querySelector(".card.inputs"); if(!card)return;
+ const groups=[...card.querySelectorAll(".group-title")];
+ groups.forEach((g,i)=>{
+   const body=[]; let n=g.nextElementSibling;
+   while(n && !n.classList.contains("group-title") && !n.classList.contains("calculate") && !n.classList.contains("hint")){body.push(n);n=n.nextElementSibling}
+   const d=document.createElement("details"); d.className="load-point"; d.open=i===0;
+   const sum=document.createElement("summary"); sum.innerHTML='<span class="point-icon">'+String(i+1).padStart(2,"0")+'</span><span class="point-main"><b>'+g.textContent.trim()+'</b><small>Tap to open details</small></span><span class="point-value">Input / Result</span><span class="point-chevron">⌄</span>';
+   const b=document.createElement("div"); b.className="point-body"; body.forEach(x=>b.appendChild(x)); d.append(sum,b); g.replaceWith(d);
+ });
+ const results=sec.querySelector(".card.results"); if(results){const h=results.querySelector(".card-head"); const list=results.querySelector(".result-list"); if(h&&list){const d=document.createElement("details");d.className="load-point result-point";d.open=true;const s=document.createElement("summary");s.innerHTML='<span class="point-icon result-icon">✓</span><span class="point-main"><b>Calculation Results</b><small>Tap to view all load results</small></span><span class="point-value">Results</span><span class="point-chevron">⌄</span>';const b=document.createElement("div");b.className="point-body";b.append(list);const f=results.querySelector(".formula");if(f)b.append(f);d.append(s,b);results.replaceWith(d)}}
+}
+initLoadPoints();

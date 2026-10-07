@@ -377,35 +377,59 @@ function showDetailingSchedule(){
 const _drawGraphModelBase=drawGraphModel;
 drawGraphModel=function(){_drawGraphModelBase();if(window.lastContinuousDesign){drawBeamDetailing();showDetailingSchedule();}};
 
-/* Beam action-point workflow */
+/* Beam action-point workflow — functional controls */
 function initBeamActionPoints(){
  const root=document.getElementById("beamActionPoints"); if(!root)return;
- const beam=document.getElementById("beam"); if(!beam)return;
- const move=(selector,target,hide=false)=>{const el=beam.querySelector(selector);if(el){document.getElementById(target)?.appendChild(el);if(hide)el.style.display="none";}};
- const grid=beam.querySelector(".grid");
+ const loadsBody=document.getElementById("actionLoadsBody");
+ const stiffBody=document.getElementById("actionStiffnessBody");
+ const contBody=document.getElementById("actionContinuousBody");
+ const designBody=document.getElementById("actionDesignBody");
+ const makeBtn=(text,cls,fn)=>{const b=document.createElement("button");b.className=cls||"calculate";b.textContent=text;b.type="button";b.onclick=fn;return b};
+ const note=(txt)=>{const p=document.createElement("p");p.className="action-note";p.textContent=txt;return p};
+
+ // Move the real analysis/design cards into their action panels.
+ const beam=document.getElementById("beam");
+ const grid=beam?.querySelector(".grid");
  const input=grid?.querySelector(".card.inputs"), result=grid?.querySelector(".card.results");
- if(input){document.getElementById("actionStiffnessBody").appendChild(input)}
- if(result){document.getElementById("actionStiffnessBody").appendChild(result)}
- const matrix=[...beam.querySelectorAll(".matrix-card")];
- const continuous=beam.querySelector(".continuous-beam");
- if(continuous)document.getElementById("actionContinuousBody").appendChild(continuous);
+ if(input)stiffBody.appendChild(input);
+ if(result)stiffBody.appendChild(result);
+ const continuous=beam?.querySelector(".continuous-beam");
+ if(continuous)contBody.appendChild(continuous);
  const cbNext=continuous?.nextElementSibling;
- if(cbNext && cbNext.classList.contains("matrix-card"))document.getElementById("actionContinuousBody").appendChild(cbNext);
- const diagram=document.getElementById("cbDiagram"); if(diagram)document.getElementById("actionContinuousBody").appendChild(diagram);
- const design=beam.querySelector(".beam-design"); if(design)document.getElementById("actionDesignBody").appendChild(design);
- // Existing stiffness matrix belongs to the single-span analysis.
+ if(cbNext && cbNext.classList.contains("matrix-card"))contBody.appendChild(cbNext);
+ const diagram=document.getElementById("cbDiagram");
+ if(diagram)contBody.appendChild(diagram);
+ const design=beam?.querySelector(".beam-design");
+ if(design)designBody.appendChild(design);
+ const matrix=[...beam.querySelectorAll(".matrix-card")];
  const singleMatrix=matrix.find(x=>!x.classList.contains("continuous-beam")&&!x.classList.contains("beam-design")&&x!==cbNext);
- if(singleMatrix)document.getElementById("actionStiffnessBody").appendChild(singleMatrix);
- // Put the load-calculator trigger in the first action without duplicating the calculator itself.
- const loadSec=document.getElementById("loads"), loadBtn=loadSec?.querySelector("#calculate");
- if(loadBtn){
-   const wrap=document.createElement("div"); wrap.className="action-linked-tool";
-   wrap.innerHTML='<div><b>Load Calculator</b><small>Open Load Calculator to edit slab, finishing, live load, beam and wall loads.</small></div>';
-   const go=document.createElement("button"); go.className="action-open-load"; go.textContent="OPEN LOAD CALCULATOR →";
-   go.onclick=()=>{document.getElementById("loads")?.scrollIntoView({behavior:"smooth",block:"start"});};
-   wrap.appendChild(go);document.getElementById("actionLoadsBody").appendChild(wrap);
- }
- const hint=document.createElement("p");hint.className="action-note";hint.textContent="Tap the action title to expand or collapse its details.";
- root.parentElement.insertBefore(hint,root.nextSibling);
+ if(singleMatrix)stiffBody.appendChild(singleMatrix);
+
+ // 01 — actual load calculation, with results shown inline.
+ const loadBox=document.createElement("div");loadBox.className="action-linked-tool";
+ const loadText=document.createElement("div");loadText.innerHTML="<b>Calculate building loads</b><small>Runs the BNBC load calculator using the current Load Calculator inputs.</small>";
+ const loadBtn=makeBtn("CALCULATE LOADS →","action-open-load",()=>{calculate();document.getElementById("loads")?.scrollIntoView({behavior:"smooth",block:"start"});});
+ loadBox.append(loadText,loadBtn);loadsBody.appendChild(loadBox);
+ loadsBody.appendChild(note("The button runs the real load-calculation function. The detailed D, L and factored results remain in Load Calculator."));
+
+ // 02 — actual one-span stiffness run.
+ const stiffBox=document.createElement("div");stiffBox.className="action-linked-tool";
+ const stiffText=document.createElement("div");stiffText.innerHTML="<b>Run direct stiffness analysis</b><small>Solves [K]{Δ}={P}, reactions, moments, shear and displacement.</small>";
+ const stiffBtn=makeBtn("RUN STIFFNESS →","action-open-load",()=>{beamStiffness();updateCad();document.getElementById("actionStiffness")?.setAttribute("open","");});
+ stiffBox.append(stiffText,stiffBtn);stiffBody.insertBefore(stiffBox,stiffBody.firstChild);
+
+ // 03 — actual multi-span continuous stiffness run.
+ const contBox=document.createElement("div");contBox.className="action-linked-tool";
+ const contText=document.createElement("div");contText.innerHTML="<b>Run continuous-beam stiffness</b><small>Solves the global multi-span system and updates span/joint actions and SFD/BMD.</small>";
+ const contBtn=makeBtn("RUN CONTINUOUS ANALYSIS →","action-open-load",()=>{continuousBeamStiffness();document.getElementById("actionContinuous")?.setAttribute("open","");});
+ contBox.append(contText,contBtn);contBody.insertBefore(contBox,contBody.firstChild);
+
+ // 04 — actual reinforcement design.
+ const designBox=document.createElement("div");designBox.className="action-linked-tool";
+ const designText=document.createElement("div");designText.innerHTML="<b>Design reinforcement</b><small>Runs the existing preliminary RCC flexure/shear design from the solved beam actions.</small>";
+ const designBtn=makeBtn("DESIGN REINFORCEMENT →","action-open-load",()=>{beamDesign();document.getElementById("actionDesign")?.setAttribute("open","");});
+ designBox.append(designText,designBtn);designBody.insertBefore(designBox,designBody.firstChild);
+
+ root.querySelectorAll("details").forEach(d=>d.addEventListener("toggle",()=>{if(d.open)d.scrollIntoView({behavior:"smooth",block:"nearest"})}));
 }
 initBeamActionPoints();

@@ -3,3 +3,6 @@
 
 .cad-tree-node{cursor:pointer}.cad-tree-node:hover{background:#e7f1ff;color:#1264ba}
 .beam-workbench .canvas-wrap{user-select:none}
+
+.graph-summary{margin-top:14px;padding:12px;border:1px solid #d8e1ec;border-radius:8px;background:#f7faff;font-size:12px;display:grid;gap:5px}
+.graph-summary b{color:#1264ba}

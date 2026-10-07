@@ -263,3 +263,50 @@ document.querySelectorAll(".cad-toolbar .tool[data-cad]").forEach(b=>b.addEventL
 const modelBtn=document.querySelector(".cad-toolbar .tool[data-cad='model']");
 if(modelBtn)modelBtn.title="Model: click empty canvas to create joints; click joint to cycle support";
 rebuildGraphTree();drawGraphModel();
+
+/* Graphical model -> multi-span direct stiffness bridge */
+function analyzeGraphicalModel(){
+ try{
+  cadNodes.sort((a,b)=>a.x-b.x);
+  if(cadNodes.length<2)throw new Error("Create at least two joints.");
+  const spans=cadNodes.length-1,Ls=cadNodes.slice(1).map((n,i)=>n.x-cadNodes[i].x);
+  if(Ls.some(x=>x<=0.1))throw new Error("Joint spacing must be greater than 0.10 m.");
+  const E=num("cbE")||num("bE")||25000,b=num("cbB")||num("bb"),h=num("cbH")||num("bh");
+  const w=cadUdl;
+  const pointBySpan=Array.from({length:spans},()=>[]);
+  cadPointLoads.forEach(p=>{
+   let k=Ls.findIndex((L,i)=>p.x>=cadNodes[i].x && p.x<=cadNodes[i+1].x);
+   if(k<0)k=spans-1;
+   pointBySpan[k].push({P:p.P,a:Math.max(0,Math.min(Ls[k],p.x-cadNodes[k].x))});
+  });
+  $("cbN").value=spans;$("cbB").value=b;$("cbH").value=h;$("cbE").value=E;
+  $("cbLengths").value=Ls.map(x=>x.toFixed(2)).join(",");
+  $("cbLoads").value=Ls.map(()=>w.toFixed(2)).join(",");
+  $("cbPoints").value=Ls.map((_,i)=>pointBySpan[i][0]?.P||0).join(",");
+  $("cbPositions").value=Ls.map((L,i)=>pointBySpan[i][0]?.a||0).join(",");
+  const left=cadNodes[0].support,right=cadNodes[cadNodes.length-1].support;
+  $("cbLeft").value=left==="fixed"?"fixed":"pin";
+  $("cbRight").value=right==="fixed"?"fixed":"roller";
+  continuousBeamStiffness();
+  setCadMode("results");
+  showGraphAnalysisSummary(Ls);
+ }catch(e){alert(e.message)}
+}
+function showGraphAnalysisSummary(Ls){
+ const panel=document.querySelector(".property-panel");if(!panel)return;
+ let box=document.getElementById("graphAnalysisSummary");
+ if(!box){box=document.createElement("div");box.id="graphAnalysisSummary";box.className="graph-summary";panel.appendChild(box)}
+ box.innerHTML="<b>GRAPHICAL ANALYSIS</b><span>"+Ls.length+" span(s)</span><span>Total length: "+Ls.reduce((a,b)=>a+b,0).toFixed(2)+" m</span><span>UDL: "+cadUdl.toFixed(2)+" kN/m</span><span>Point loads: "+cadPointLoads.length+"</span><span>Model: Direct Stiffness</span>";
+}
+function graphicalResultsOverlay(){
+ const c=$("beamModelCanvas");if(!c)return;
+ const ctx=c.getContext("2d"),{L,x1,x2,y,s}=graphCanvasGeometry();
+ if(cadMode!=="results"||!lastBeamResult)return;
+ ctx.save();ctx.fillStyle="#1674e8";ctx.font="bold 11px system-ui";
+ ctx.fillText("ANALYSIS RESULTS • SFD / BMD available below",x1,y+92);
+ ctx.restore();
+}
+const oldGraphDraw=drawGraphModel;
+drawGraphModel=function(){oldGraphDraw();graphicalResultsOverlay()};
+const oldAnalyzeCad=$("cadAnalyze");
+if(oldAnalyzeCad){oldAnalyzeCad.onclick=()=>analyzeGraphicalModel()}

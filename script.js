@@ -376,3 +376,36 @@ function showDetailingSchedule(){
 }
 const _drawGraphModelBase=drawGraphModel;
 drawGraphModel=function(){_drawGraphModelBase();if(window.lastContinuousDesign){drawBeamDetailing();showDetailingSchedule();}};
+
+/* Beam action-point workflow */
+function initBeamActionPoints(){
+ const root=document.getElementById("beamActionPoints"); if(!root)return;
+ const beam=document.getElementById("beam"); if(!beam)return;
+ const move=(selector,target,hide=false)=>{const el=beam.querySelector(selector);if(el){document.getElementById(target)?.appendChild(el);if(hide)el.style.display="none";}};
+ const grid=beam.querySelector(".grid");
+ const input=grid?.querySelector(".card.inputs"), result=grid?.querySelector(".card.results");
+ if(input){document.getElementById("actionStiffnessBody").appendChild(input)}
+ if(result){document.getElementById("actionStiffnessBody").appendChild(result)}
+ const matrix=[...beam.querySelectorAll(".matrix-card")];
+ const continuous=beam.querySelector(".continuous-beam");
+ if(continuous)document.getElementById("actionContinuousBody").appendChild(continuous);
+ const cbNext=continuous?.nextElementSibling;
+ if(cbNext && cbNext.classList.contains("matrix-card"))document.getElementById("actionContinuousBody").appendChild(cbNext);
+ const diagram=document.getElementById("cbDiagram"); if(diagram)document.getElementById("actionContinuousBody").appendChild(diagram);
+ const design=beam.querySelector(".beam-design"); if(design)document.getElementById("actionDesignBody").appendChild(design);
+ // Existing stiffness matrix belongs to the single-span analysis.
+ const singleMatrix=matrix.find(x=>!x.classList.contains("continuous-beam")&&!x.classList.contains("beam-design")&&x!==cbNext);
+ if(singleMatrix)document.getElementById("actionStiffnessBody").appendChild(singleMatrix);
+ // Put the load-calculator trigger in the first action without duplicating the calculator itself.
+ const loadSec=document.getElementById("loads"), loadBtn=loadSec?.querySelector("#calculate");
+ if(loadBtn){
+   const wrap=document.createElement("div"); wrap.className="action-linked-tool";
+   wrap.innerHTML='<div><b>Load Calculator</b><small>Open Load Calculator to edit slab, finishing, live load, beam and wall loads.</small></div>';
+   const go=document.createElement("button"); go.className="action-open-load"; go.textContent="OPEN LOAD CALCULATOR →";
+   go.onclick=()=>{document.getElementById("loads")?.scrollIntoView({behavior:"smooth",block:"start"});};
+   wrap.appendChild(go);document.getElementById("actionLoadsBody").appendChild(wrap);
+ }
+ const hint=document.createElement("p");hint.className="action-note";hint.textContent="Tap the action title to expand or collapse its details.";
+ root.parentElement.insertBefore(hint,root.nextSibling);
+}
+initBeamActionPoints();

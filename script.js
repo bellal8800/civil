@@ -148,3 +148,118 @@ document.querySelectorAll(".nav-item").forEach(btn=>btn.addEventListener("click"
  const t=$(btn.dataset.section);if(t)t.style.display="block";
 }));
 calculate();
+/* Graphical model builder — current analysis engine supports the active two-joint member */
+let cadNodes=[
+ {id:1,x:0,support:"pin"},
+ {id:2,x:null,support:"roller"}
+];
+let cadPointLoads=[];
+let cadUdl=10;
+
+function syncGraphModel(){
+ const L=Math.max(.5,num("bL"));
+ if(cadNodes.length<2)cadNodes=[{id:1,x:0,support:"pin"},{id:2,x:L,support:"roller"}];
+ if(cadNodes[1].x===null||cadNodes[1].x<=0)cadNodes[1].x=L;
+ $("bL").value=cadNodes[1].x.toFixed(2);
+ $("bLeft").value=cadNodes[0].support==="fixed"?"fixed":"pin";
+ $("bRight").value=cadNodes[1].support==="fixed"?"fixed":cadNodes[1].support==="free"?"free":"roller";
+ $("bw").value=cadUdl;
+ if(cadPointLoads.length){
+   const p=cadPointLoads[cadPointLoads.length-1];
+   $("bP").value=p.P;$("ba").value=p.x.toFixed(2);
+ }
+}
+function graphCanvasGeometry(){
+ const c=$("beamModelCanvas"),L=Math.max(.5,num("bL")),x1=110,x2=c.width-110,y=270;
+ return {c,L,x1,x2,y,s:(x2-x1)/L};
+}
+function graphHitNode(p){
+ for(const n of cadNodes){
+   const nx=p.x1+n.x*p.s;
+   if(Math.abs(p.px-nx)<28 && Math.abs(p.py-p.y)<45)return n;
+ }
+ return null;
+}
+function drawGraphModel(){
+ const {c,L,x1,x2,y,s}=graphCanvasGeometry(),ctx=c.getContext("2d"),W=c.width,H=c.height;
+ ctx.clearRect(0,0,W,H);ctx.fillStyle="#f7f9fc";ctx.fillRect(0,0,W,H);
+ ctx.strokeStyle="#d7dee8";ctx.lineWidth=1;
+ for(let x=x1;x<=x2+1;x+=Math.max(45,s)){ctx.beginPath();ctx.moveTo(x,70);ctx.lineTo(x,470);ctx.stroke()}
+ const pts=cadNodes.slice().sort((a,b)=>a.x-b.x);
+ ctx.strokeStyle="#27364b";ctx.lineWidth=8;
+ for(let i=0;i<pts.length-1;i++){const xa=x1+pts[i].x*s,xb=x1+pts[i+1].x*s;ctx.beginPath();ctx.moveTo(xa,y);ctx.lineTo(xb,y);ctx.stroke()}
+ function support(x,type){
+   ctx.strokeStyle="#334155";ctx.lineWidth=2;
+   if(type==="fixed"){ctx.beginPath();ctx.moveTo(x,y-34);ctx.lineTo(x,y+34);ctx.stroke();
+     for(let yy=y-30;yy<=y+30;yy+=9){ctx.beginPath();ctx.moveTo(x,yy);ctx.lineTo(x-14,yy+7);ctx.stroke()}
+   }else if(type!=="free"){ctx.beginPath();ctx.moveTo(x,y+7);ctx.lineTo(x-18,y+34);ctx.lineTo(x+18,y+34);ctx.closePath();ctx.stroke();
+     ctx.beginPath();ctx.moveTo(x-25,y+40);ctx.lineTo(x+25,y+40);ctx.stroke()}
+ }
+ for(const n of pts){const x=x1+n.x*s;support(x,n.support);ctx.fillStyle=n.id===cadSelection?"#1674e8":"#263548";ctx.beginPath();ctx.arc(x,y,7,0,Math.PI*2);ctx.fill();
+   ctx.fillStyle="#34435a";ctx.font="11px system-ui";ctx.fillText("J"+n.id,x-8,y-48);ctx.fillText(n.support.toUpperCase(),x-25,y+62)}
+ if(cadUdl>0&&pts.length>=2){ctx.strokeStyle="#d14b4b";ctx.fillStyle="#d14b4b";ctx.lineWidth=1.5;
+   const xa=x1+pts[0].x*s,xb=x1+pts[pts.length-1].x*s;
+   for(let i=0;i<=12;i++){const x=xa+(xb-xa)*i/12;ctx.beginPath();ctx.moveTo(x,y-55);ctx.lineTo(x,y-12);ctx.stroke();ctx.beginPath();ctx.moveTo(x-5,y-20);ctx.lineTo(x,y-12);ctx.lineTo(x+5,y-20);ctx.fill()}
+   ctx.fillText("UDL = "+cadUdl.toFixed(2)+" kN/m",xa,y-68)
+ }
+ for(const p of cadPointLoads){const x=x1+p.x*s;ctx.strokeStyle="#7c3aed";ctx.fillStyle="#7c3aed";ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(x,y-100);ctx.lineTo(x,y-18);ctx.stroke();ctx.beginPath();ctx.moveTo(x-7,y-28);ctx.lineTo(x,y-16);ctx.lineTo(x+7,y-28);ctx.fill();ctx.font="11px system-ui";ctx.fillText(p.P+" kN",x+8,y-80)}
+ ctx.fillStyle="#1674e8";ctx.font="bold 11px system-ui";ctx.fillText("GRAPHICAL MODEL • "+cadMode.toUpperCase(),x1,32);
+ ctx.fillStyle="#66758a";ctx.font="11px system-ui";ctx.fillText("Click empty space = create Joint",x1,500);
+ ctx.fillText("Click Joint = select / support",x1+210,500);
+ ctx.fillText("Loads mode: click beam = Point Load",x1+440,500);
+}
+function rebuildGraphTree(){
+ const ex=document.querySelector(".model-explorer");if(!ex)return;
+ ex.innerHTML='<div class="explorer-title">MODEL EXPLORER • '+cadMode.toUpperCase()+'</div><div class="tree-root">▾ <b>Beam Model</b></div><div class="tree-item selected">▾ Geometry</div>';
+ cadNodes.forEach(n=>ex.insertAdjacentHTML("beforeend",'<div class="tree-sub cad-tree-node" data-node="'+n.id+'">Joint '+n.id+' — '+n.support+'</div>'));
+ ex.insertAdjacentHTML("beforeend",'<div class="tree-sub cad-tree-node">Beam 1</div><div class="tree-item">▾ Loads</div><div class="tree-sub">UDL — '+cadUdl.toFixed(2)+' kN/m</div>');
+ cadPointLoads.forEach((p,i)=>ex.insertAdjacentHTML("beforeend",'<div class="tree-sub">Point Load '+(i+1)+' — '+p.P+' kN @ '+p.x.toFixed(2)+' m</div>'));
+ ex.insertAdjacentHTML("beforeend",'<div class="tree-item">▾ Analysis</div><div class="tree-sub">Direct Stiffness</div><div class="tree-item">▾ Design</div><div class="tree-sub">Flexure</div><div class="tree-sub">Shear</div><div class="tree-sub">Detailing</div>');
+ ex.querySelectorAll(".cad-tree-node").forEach(el=>el.addEventListener("click",()=>{
+   const n=cadNodes.find(q=>"Joint "+q.id+" — "+q.support===el.textContent.trim());
+   if(n){cadSelection=n.id;showGraphProperties(n);drawGraphModel()}
+ }));
+}
+function showGraphProperties(n){
+ const panel=document.querySelector(".property-panel");if(!panel)return;
+ const rows=panel.querySelectorAll(".prop-row");if(rows[0])rows[0].querySelector("strong").textContent="Joint";
+ if(rows[1])rows[1].querySelector("strong").textContent="Joint "+n.id;
+ if(rows[2])rows[2].querySelector("strong").textContent=(n.x||0).toFixed(2)+" m";
+}
+function addGraphJoint(x){
+ const L=Math.max(.5,num("bL"));
+ if(cadNodes.length>=4){alert("This graphical builder currently supports up to 4 joints.");return}
+ const nx=Math.max(.25,Math.min(L-.25,x));
+ if(cadNodes.some(n=>Math.abs(n.x-nx)<.25))return;
+ const id=Math.max(...cadNodes.map(n=>n.id))+1;
+ cadNodes.push({id,x:nx,support:"free"});
+ cadNodes.sort((a,b)=>a.x-b.x);
+ rebuildGraphTree();drawGraphModel();
+}
+function cycleSupport(n){
+ const order=["free","pin","roller","fixed"],i=order.indexOf(n.support);n.support=order[(i+1)%order.length];
+ if(n.id===1)$("bLeft").value=n.support==="fixed"?"fixed":"pin";
+ if(n.id===cadNodes[cadNodes.length-1].id)$("bRight").value=n.support==="fixed"?"fixed":"roller";
+ rebuildGraphTree();drawGraphModel();
+}
+function graphClick(ev){
+ const p=cadCanvasPoint(ev),node=graphHitNode(p);
+ if(cadMode==="model"){
+   if(node){cadSelection=node.id;cycleSupport(node);showGraphProperties(node)}
+   else addGraphJoint(p.x);
+   syncGraphModel();drawGraphModel();
+ }else if(cadMode==="loads"){
+   if(p.py>y-100 && p.py<y+45 && p.x>=0&&p.x<=L){
+     const P=Number(prompt("Point load P (kN)",num("bP")||10));
+     if(Number.isFinite(P)&&P>0){cadPointLoads.push({P,x:p.x});$("bP").value=P;$("ba").value=p.x.toFixed(2);beamStiffness()}
+     rebuildGraphTree();drawGraphModel();
+   }
+ }else if(cadMode==="analyze"){beamStiffness();setCadMode("results")}
+ else if(cadMode==="design"){beamDesign();drawGraphModel()}
+}
+drawBeamModel=function(){syncGraphModel();drawGraphModel();};
+if(cadCanvas){cadCanvas.removeEventListener("click",handleCadCanvasClick);cadCanvas.addEventListener("click",graphClick)}
+document.querySelectorAll(".cad-toolbar .tool[data-cad]").forEach(b=>b.addEventListener("click",()=>{setCadMode(b.dataset.cad);rebuildGraphTree()}));
+const modelBtn=document.querySelector(".cad-toolbar .tool[data-cad='model']");
+if(modelBtn)modelBtn.title="Model: click empty canvas to create joints; click joint to cycle support";
+rebuildGraphTree();drawGraphModel();

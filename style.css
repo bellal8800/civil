@@ -6,3 +6,25 @@
 
 .graph-summary{margin-top:14px;padding:12px;border:1px solid #d8e1ec;border-radius:8px;background:#f7faff;font-size:12px;display:grid;gap:5px}
 .graph-summary b{color:#1264ba}
+
+/* Beam action points */
+.beam-action-points{display:grid;gap:10px;margin:18px 0 20px}
+.beam-action{border:1px solid #d8e2ec;border-radius:15px;background:#fff;overflow:hidden;box-shadow:0 4px 16px rgba(16,42,67,.06)}
+.beam-action[open]{border-color:#9fc3e2;box-shadow:0 9px 24px rgba(16,42,67,.10)}
+.beam-action>summary{list-style:none;display:grid;grid-template-columns:42px minmax(0,1fr) 28px;align-items:center;gap:13px;padding:12px 16px;min-height:70px;cursor:pointer}
+.beam-action>summary::-webkit-details-marker{display:none}
+.beam-action .action-num{width:36px;height:36px;border-radius:10px;display:grid;place-items:center;background:#edf5fc;color:#1769a8;font-size:11px;font-weight:900}
+.beam-action summary span:nth-child(2){display:flex;flex-direction:column;gap:3px}.beam-action summary b{font-size:14px;color:#183b59}.beam-action summary small{font-size:11px;color:#7b8b9b}
+.beam-action summary em{font-style:normal;font-size:21px;color:#8091a4;transition:.2s}.beam-action[open] summary em{transform:rotate(180deg);color:#1769a8}
+.beam-action-body,.action-body{padding:0 16px 18px;border-top:1px solid #edf2f7;background:#fbfdff}
+.beam-action .card,.beam-action .matrix-card,.beam-action .diagram-card{margin:14px 0 0}
+.action-linked-tool{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:15px;margin-top:14px;border:1px solid #dfe8f0;border-radius:12px;background:#fff}
+.action-linked-tool div{display:flex;flex-direction:column;gap:4px}.action-linked-tool b{font-size:13px;color:#183b59}.action-linked-tool small{font-size:11px;color:#718397}
+.action-open-load{border:0;border-radius:9px;padding:10px 13px;background:#173f5f;color:#fff;font-size:11px;font-weight:800;cursor:pointer}
+.action-note{text-align:center;margin:0 0 12px;color:#8492a1;font-size:11px}
+@media(max-width:650px){
+ .beam-action>summary{grid-template-columns:36px minmax(0,1fr) 20px;padding:10px 11px;gap:9px}
+ .beam-action .action-num{width:32px;height:32px}.beam-action summary b{font-size:13px}.beam-action summary small{font-size:10px}
+ .action-linked-tool{align-items:stretch;flex-direction:column}.action-open-load{width:100%}
+ .action-body{padding:0 10px 14px}
+}

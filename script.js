@@ -435,3 +435,18 @@ function initBeamActionPoints(){
  root.querySelectorAll("details").forEach(d=>d.addEventListener("toggle",()=>{if(d.open)d.scrollIntoView({behavior:"smooth",block:"nearest"})}));
 }
 initBeamActionPoints();
+
+/* Unified app navigation: sidebar, dashboard cards and mobile tab bar */
+(function initAppNavigation(){
+ function go(section){
+  document.querySelectorAll(".section").forEach(x=>x.classList.toggle("active-section",x.id===section));
+  document.querySelectorAll("[data-section]").forEach(x=>x.classList.toggle("active",x.dataset.section===section));
+  const title=document.querySelector(".topbar h1");
+  const sub=document.querySelector(".topbar .subtitle");
+  const meta={home:["Structural Design Toolkit","Loads, analysis and RCC design in one workspace."],loads:["Building Load Calculator","Slab, beam, wall, finishing and occupancy-based load calculations."],beam:["RCC Beam Workbench","Stiffness analysis, continuous beam actions and preliminary reinforcement."],column:["RCC Column Design","Axial load, interaction and preliminary reinforcement design."],slab:["RCC Slab Design","One-way and two-way slab analysis and preliminary reinforcement."]}[section];
+  if(meta&&title){title.textContent=meta[0];if(sub)sub.textContent=meta[1]}
+  window.scrollTo({top:0,behavior:"smooth"});
+ }
+ document.addEventListener("click",e=>{const el=e.target.closest("[data-section]");if(el){e.preventDefault();go(el.dataset.section)}});
+ go(document.querySelector(".section.active-section")?.id||"home");
+})();

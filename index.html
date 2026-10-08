@@ -10,6 +10,7 @@
 <aside class="sidebar">
 <div class="brand"><div class="brand-mark">CE</div><div><strong>Civil Engineering</strong><span>BNBC 2020 Toolkit</span></div></div>
 <nav>
+<button class="nav-item home-nav" data-section="home">⌂ <span>Home</span></button>
 <button class="nav-item active" data-section="loads">▤ <span>Load Calculator</span></button>
 <button class="nav-item" data-section="beam">▦ <span>RCC Beam</span></button>
 <button class="nav-item" data-section="column">▥ <span>RCC Column</span></button>
@@ -17,7 +18,16 @@
 </nav>
 <div class="side-note"><b>BNBC 2020 basis</b><p>Gravity loads are organized around BNBC 2020 Part 6, Chapter 2. Check project-specific drawings, occupancy and actual materials before final design.</p></div>
 </aside>
-<main class="main">
+<main class="main"><section id="home" class="section home-section">
+<div class="home-hero"><div><p class="eyebrow">BNBC 2020 • CIVIL ENGINEERING APP</p><h1>Structural Design<br><span>Toolkit</span></h1><p class="subtitle">Calculate loads, analyze beams, design RCC members — in one smooth workspace.</p></div><div class="home-orb">CE</div></div>
+<div class="module-grid">
+<button class="module-card" data-section="loads"><span class="module-icon">▤</span><b>Load Calculator</b><small>Dead • Live • Factored</small><i>→</i></button>
+<button class="module-card" data-section="beam"><span class="module-icon">━</span><b>RCC Beam</b><small>Stiffness • SFD • BMD • Design</small><i>→</i></button>
+<button class="module-card" data-section="column"><span class="module-icon">▥</span><b>RCC Column</b><small>Axial • Interaction • Reinforcement</small><i>→</i></button>
+<button class="module-card" data-section="slab"><span class="module-icon">▤</span><b>RCC Slab</b><small>One-way • Two-way • Design</small><i>→</i></button>
+</div>
+<div class="home-strip"><span>●</span><div><b>Engineering workspace</b><small>Keep inputs, analysis and design results together.</small></div><strong>BNBC 2020</strong></div>
+</section>
 <header class="topbar"><div><p class="eyebrow">BNBC 2020 • PART 6 • STRUCTURAL DESIGN</p><h1>Building Load Calculator</h1><p class="subtitle">Slab, beam, wall, finishing and occupancy-based live-load calculations.</p></div><div class="status"><span></span> BNBC 2020</div></header>
 
 <section id="loads" class="section active-section">

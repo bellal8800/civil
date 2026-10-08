@@ -452,3 +452,16 @@ initBeamActionPoints();
 })();
 
 (function initColumnPreview(){const b=$("columnPreview");if(!b)return;b.onclick=()=>{const w=num("cbw"),h=num("cbh"),fc=num("cfc"),fy=num("cfy"),Pu=num("cpu"),Mu=num("cmu"),Ag=w*h,stress=Pu*1000/Ag,bar=num("cbar"),Ast=8*Math.PI*bar*bar/4,rho=Ast/Ag*100,ok=stress<=0.35*fc;$("cAg").textContent=Ag.toLocaleString();$("cPuOut").textContent=Pu.toFixed(1);$("cMuOut").textContent=Mu.toFixed(1);$("cStress").textContent=stress.toFixed(2);$("cRho").textContent=rho.toFixed(2);$("cStatus").textContent=ok?"TRIAL OK — continue design":"REVIEW SECTION";};})();
+
+(function initColumnInteraction(){
+ const run=$("columnInteraction");if(!run)return;
+ run.onclick=function(){
+  const w=num("cbw"),h=num("cbh"),fc=num("cfc"),fy=num("cfy"),Pu=num("cpu"),Mu=num("cmu"),Ag=w*h,db=num("cbar"),Ast=8*Math.PI*db*db/4,phi=.65,Po=.85*fc*(Ag-Ast)+fy*Ast,points=[];
+  for(let i=0;i<=20;i++){const r=i/20;points.push([Mu*1.8*(1-Math.pow(r,.7)),phi*Po*(1-r*.72)]);}
+  const c=$("columnInteractionCanvas"),ctx=c.getContext("2d"),W=c.width,H=c.height,maxM=Math.max.apply(null,points.map(function(p){return p[0]}),Mu*1.2),maxP=Math.max.apply(null,points.map(function(p){return p[1]}),Pu*1.2),X=function(m){return 45+m/maxM*(W-75)},Y=function(p){return H-35-p/maxP*(H-65)};
+  ctx.clearRect(0,0,W,H);ctx.beginPath();points.forEach(function(p,i){if(i)ctx.lineTo(X(p[0]),Y(p[1]));else ctx.moveTo(X(p[0]),Y(p[1]))});ctx.strokeStyle="#007aff";ctx.lineWidth=3;ctx.stroke();ctx.beginPath();ctx.moveTo(X(0),Y(0));ctx.lineTo(X(Mu),Y(Pu));ctx.strokeStyle="#ff3b30";ctx.setLineDash([6,5]);ctx.stroke();ctx.setLineDash([]);ctx.fillStyle="#111827";ctx.font="12px system-ui";ctx.fillText("M (kN·m)",W-90,H-10);ctx.fillText("P (kN)",8,22);
+  $("interactionStatus").textContent=Pu<=phi*Po*.28?"Trial point inside curve":"Review section";$("interactionSummary").textContent="Preliminary screening curve. Final ACI/BNBC interaction analysis requires strain compatibility, phi transition and all applicable load combinations.";
+ };
+ const bars=$("columnBars");if(bars)bars.onclick=function(){const Ag=num("cbw")*num("cbh"),opts=[12,16,20,25,28],min=.01*Ag,max=.08*Ag,out=[];opts.forEach(function(d){const A=12*Math.PI*d*d/4;if(A>=min&&A<=max)out.push("12Ø"+d+" • "+A.toFixed(0)+" mm²")});$("columnBarOptions").textContent=out.length?out.join("   |   "):"No trial bar option in the preliminary 1–8% range.";};
+})();
+(function initTwoWay(){const b=$("twoWayAnalyze");if(!b)return;b.onclick=function(){const Lx=num("twLx"),Ly=num("twLy"),D=num("twd"),L=num("twl"),wu=Math.max(1.4*D,1.2*D+1.6*L),ratio=Lx/Ly,Mo=wu*Ly*Ly*Lx/8;$("twratio").textContent=ratio.toFixed(2);$("twwu").textContent=wu.toFixed(2);$("twMo").textContent=Mo.toFixed(2);$("twshort").textContent=ratio<=2?"Strong two-way action":"Long-span direction becomes dominant";};})();

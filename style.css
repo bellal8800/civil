@@ -28,3 +28,19 @@
  .action-linked-tool{align-items:stretch;flex-direction:column}.action-open-load{width:100%}
  .action-body{padding:0 10px 14px}
 }
+
+/* iOS-like Civil Engineering App UI */
+:root{--ios-blue:#007aff;--ios-bg:#f2f2f7;--ios-card:rgba(255,255,255,.92);--ios-text:#111827;--ios-muted:#6b7280;--ios-border:rgba(60,60,67,.12);--ios-shadow:0 8px 28px rgba(0,0,0,.08)}
+body{background:var(--ios-bg);-webkit-font-smoothing:antialiased}
+.card,.beam-action,.action-linked-tool,.matrix-card,.continuous-beam,.beam-design{border:1px solid var(--ios-border)!important;border-radius:18px!important;box-shadow:var(--ios-shadow);background:var(--ios-card);backdrop-filter:blur(18px)}
+button,.calculate,.action-open-load{border:0;border-radius:13px;min-height:44px;background:var(--ios-blue);color:#fff;font-weight:700;letter-spacing:.1px;box-shadow:0 5px 14px rgba(0,122,255,.22);transition:transform .16s ease,box-shadow .16s ease,filter .16s ease}
+button:active,.calculate:active,.action-open-load:active{transform:scale(.97);box-shadow:0 2px 7px rgba(0,122,255,.18)}
+input,select{border:1px solid var(--ios-border)!important;border-radius:12px!important;background:rgba(255,255,255,.82)!important;min-height:44px;transition:border-color .18s,box-shadow .18s}
+input:focus,select:focus{outline:none;border-color:var(--ios-blue)!important;box-shadow:0 0 0 3px rgba(0,122,255,.14)}
+.card h2,.card h3,.beam-action summary b{letter-spacing:-.02em}
+.beam-action summary{min-height:62px;padding:14px 16px;cursor:pointer;list-style:none}
+.beam-action summary::-webkit-details-marker{display:none}
+.beam-action[open] summary{border-bottom:1px solid var(--ios-border)}
+.action-body{padding:14px}
+@media(max-width:700px){.card,.beam-action,.matrix-card,.continuous-beam,.beam-design{border-radius:16px!important}.grid{gap:12px!important}input,select,button{font-size:16px!important}.beam-action summary{padding:13px 12px}.action-body{padding:10px}}
+@media(prefers-reduced-motion:reduce){*,*:before,*:after{scroll-behavior:auto!important;transition:none!important;animation:none!important}}

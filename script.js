@@ -450,3 +450,5 @@ initBeamActionPoints();
  document.addEventListener("click",e=>{const el=e.target.closest("[data-section]");if(el){e.preventDefault();go(el.dataset.section)}});
  go(document.querySelector(".section.active-section")?.id||"home");
 })();
+
+(function initColumnPreview(){const b=$("columnPreview");if(!b)return;b.onclick=()=>{const w=num("cbw"),h=num("cbh"),fc=num("cfc"),fy=num("cfy"),Pu=num("cpu"),Mu=num("cmu"),Ag=w*h,stress=Pu*1000/Ag,bar=num("cbar"),Ast=8*Math.PI*bar*bar/4,rho=Ast/Ag*100,ok=stress<=0.35*fc;$("cAg").textContent=Ag.toLocaleString();$("cPuOut").textContent=Pu.toFixed(1);$("cMuOut").textContent=Mu.toFixed(1);$("cStress").textContent=stress.toFixed(2);$("cRho").textContent=rho.toFixed(2);$("cStatus").textContent=ok?"TRIAL OK — continue design":"REVIEW SECTION";};})();
